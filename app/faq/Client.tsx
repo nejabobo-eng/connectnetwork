@@ -3,12 +3,13 @@ import { useState } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 
 const faqs = [
-	{q:'How much is the Starter Package?',a:'Package pricing and inclusions are provided in our Product Packages. Customers may optionally register as distributors.'},
-  {q:'How do I become a distributor?',a:'Simply contact us after purchasing the Starter Pack and we will guide you through the optional distributor registration.'},
-	{q:'How do commissions work?',a:'Referral commissions are paid in accordance with the current ConnectNetwork Compensation Plan after qualifying purchases are confirmed.'},
+  {q:'How does ConnectNetwork work?', a:'ConnectNetwork is a product distribution business. Every package purchased includes genuine products. Customers may choose to register as distributors and earn referral rewards when they introduce new customers who purchase qualifying product packages.'},
+  {q:'What do I receive when I purchase a package?', a:'Every package includes the products described for that package. ConnectNetwork is committed to delivering the products purchased in accordance with our delivery policy.'},
+  {q:'Is becoming a distributor compulsory?', a:'No. Anyone may purchase ConnectNetwork products without participating as a distributor. Becoming a distributor is entirely optional.'},
+  {q:'How much is the Starter Pack?',a:'See our Product Packages for current pricing and inclusions.'},
+  {q:'What is the distributor joining fee?',a:'R300 once-off, payable only if you choose to register as a distributor.'},
+  {q:'How do referral rewards work?',a:'Referral rewards are paid in accordance with the current Distributor Rewards Plan after qualifying purchases are confirmed.'},
   {q:'How long does delivery take?',a:'Delivery times vary by location, especially for rural areas. All orders are tracked until fulfilled.'},
-  {q:'Do I have to recruit people?',a:'No. You can simply buy and use the products. Distribution is optional for those who want to earn referral income.'},
-  {q:'Can I simply buy products?',a:'Yes. Anyone can purchase products without becoming a distributor.'},
 ]
 
 export default function FAQClient(){

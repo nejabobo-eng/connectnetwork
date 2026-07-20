@@ -69,7 +69,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
 			</div>
 			<div>
 			  <div className="font-semibold mb-3">Legal</div>
-			  <ul className="space-y-2 text-gray-600">
+				<ul className="space-y-2 text-gray-600">
 				<li><Link href="/legal/terms">Terms & Conditions</Link></li>
 				<li><Link href="/legal/privacy">Privacy Policy</Link></li>
 				<li><Link href="/legal/disclaimer">Disclaimer</Link></li>
@@ -80,12 +80,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
 			  <div className="font-semibold mb-3">Contact</div>
 			  <ul className="space-y-2 text-gray-600">
 				<li><a href="mailto:info@connectnetwork.co.za">info@connectnetwork.co.za</a></li>
-				<li className="flex gap-3 text-gray-500">
-				  <a href="#" aria-label="Facebook">Fb</a>
-				  <a href="#" aria-label="Instagram">Ig</a>
-				  <a href="#" aria-label="TikTok">Tt</a>
-				  <a href="#" aria-label="LinkedIn">In</a>
-				</li>
+				<li><a href="https://wa.me/27745513626" target="_blank" rel="noopener noreferrer">WhatsApp: +27 74 551 3626</a></li>
 			  </ul>
 			</div>
 		  </div>
