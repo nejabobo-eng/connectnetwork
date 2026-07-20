@@ -1,7 +1,7 @@
 "use client"
 import Image from 'next/image'
 import Link from 'next/link'
-import { ArrowRight, PackageCheck, Users, HandCoins } from 'lucide-react'
+import { ArrowRight, PackageCheck, Users, HandCoins, CheckCircle } from 'lucide-react'
 import { motion } from 'framer-motion'
 import type { ReactNode } from 'react'
 
@@ -28,12 +28,27 @@ export default function HomeClient() {
 		</svg>
 
 		<div className="container-section grid md:grid-cols-2 gap-10 items-center min-h-[88vh] py-24">
-		  <motion.div initial={{y:20, opacity:0}} whileInView={{y:0, opacity:1}} viewport={{once:true}} transition={{duration:0.7}}>
+			<motion.div initial={{y:20, opacity:0}} whileInView={{y:0, opacity:1}} viewport={{once:true}} transition={{duration:0.7}}>
+			<img src="/logo/logo.jpg" alt="ConnectNetwork logo" className="h-16 md:h-24 w-auto mb-4" />
 			<h1 className="section-title text-4xl md:text-6xl leading-tight">Connecting Products. Connecting People.</h1>
-			<p className="section-subtitle mt-4 max-w-2xl">Building a trusted South African distribution network for quality household products. Customers who wish to may also register as independent distributors.</p>
+			<p className="section-subtitle mt-4 max-w-2xl">
+			  A South African distribution company supplying quality household products. Choose to use the products or become a distributor and earn referral rewards under our Distributor Rewards Plan.
+			</p>
 			<div className="mt-8 flex gap-4">
 			  <Link href="#learn-more" className="btn btn-primary">Learn More <ArrowRight className="ml-2 h-4 w-4" /></Link>
 			  <Link href="/contact" className="btn btn-ghost">Contact Us</Link>
+			</div>
+			  <div className="mt-6 grid grid-cols-1 sm:grid-cols-3 gap-3 text-sm text-gray-700" aria-label="Key assurances">
+			  {[
+				'Quality Products',
+				'Trusted Distribution',
+				'Growing Community'
+			  ].map((label, i) => (
+				<div key={label} className="flex items-center gap-2 bg-white/70 backdrop-blur rounded-full px-3 py-2 shadow-sm">
+				  <CheckCircle className="h-4 w-4 text-green-600" aria-hidden />
+				  <span>{label}</span>
+				</div>
+			  ))}
 			</div>
 		  </motion.div>
 		  <motion.div className="relative h-[420px] md:h-[520px]" initial={{scale:0.96, opacity:0}} whileInView={{scale:1, opacity:1}} viewport={{once:true}} transition={{duration:0.8}}>
@@ -61,7 +76,7 @@ export default function HomeClient() {
 		</div>
 	  </section>
 
-	  <section className="bg-gray-50 py-20">
+		<section className="bg-gray-50 py-20">
 		<div className="container-section">
 		  <SectionTitle title="Why ConnectNetwork?" center />
 		  <div className="grid md:grid-cols-4 gap-6 mt-10">
@@ -70,6 +85,13 @@ export default function HomeClient() {
 			<FeatureCard icon={<HandCoins className="h-6 w-6 text-primary" />} title="Extra Income" desc="Optional opportunity to earn referral commissions." />
 			<FeatureCard icon={<Users className="h-6 w-6 text-primary" />} title="Community" desc="Helping ordinary South Africans build sustainable income." />
 		  </div>
+		</div>
+	  </section>
+
+	  <section className="container-section py-20" aria-labelledby="our-promise">
+		<SectionTitle title="Our Promise" center />
+		<div id="our-promise" className="mt-6 max-w-3xl mx-auto text-gray-700 text-center leading-relaxed">
+		  At ConnectNetwork, we are committed to supplying quality products, treating our customers and distributors with honesty and respect, and building a sustainable distribution network that creates value for everyone involved. We believe long-term success is built on trust, reliable service, and products that people genuinely use and appreciate.
 		</div>
 	  </section>
 

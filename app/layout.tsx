@@ -53,10 +53,10 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
 		<footer className="mt-24 border-t relative overflow-hidden">
 		  {/* network pattern background */}
 		  <NetworkBackground subtle />
-		  <div className="container-section grid md:grid-cols-4 gap-8 py-12 text-sm relative">
+			<div className="container-section grid md:grid-cols-4 gap-8 py-12 text-sm relative">
 			<div>
 			  <div className={`text-primary font-bold text-lg mb-2 ${poppins.className}`}>ConnectNetwork</div>
-			  <p className="text-gray-600">Connecting Products. Connecting People.</p>
+				<p className="text-gray-600">Quality Products • Trusted Distribution • Growing Together</p>
 			</div>
 			<div>
 				<div className="font-semibold mb-3">Company</div>
