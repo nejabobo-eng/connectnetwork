@@ -17,6 +17,10 @@ export default function FAQPage(){
 		  <li>ConnectNetwork works with suppliers to distribute products to customers.</li>
 		</ul>
 	  </section>
+
+	  <p className="text-xs text-gray-500 mt-8">
+		ConnectNetwork reserves the right to update its products, pricing, Distributor Rewards Plan, and operating policies from time to time. The latest versions published by ConnectNetwork will apply.
+	  </p>
 	</div>
   )
 }
