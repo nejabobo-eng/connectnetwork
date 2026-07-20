@@ -40,12 +40,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
 		  url: 'https://connectnetwork.co.za',
 		  email: 'info@connectnetwork.co.za',
 			logo: 'https://connectnetwork.co.za/logo/logo.jpg',
-		  sameAs: [
-			'https://facebook.com/ConnectNetwork',
-			'https://instagram.com/ConnectNetwork',
-			'https://linkedin.com/company/connectnetwork',
-			'https://tiktok.com/@connectnetwork'
-		  ]
+		  sameAs: []
 		}) }} />
 		<main className="pt-16 transition-opacity duration-200" id="main">
 		  {children}
