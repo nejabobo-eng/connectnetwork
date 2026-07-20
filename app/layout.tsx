@@ -39,7 +39,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
 		  name: 'ConnectNetwork',
 		  url: 'https://connectnetwork.co.za',
 		  email: 'info@connectnetwork.co.za',
-		  logo: 'https://connectnetwork.co.za/logo.png',
+			logo: 'https://connectnetwork.co.za/logo/logo.jpg',
 		  sameAs: [
 			'https://facebook.com/ConnectNetwork',
 			'https://instagram.com/ConnectNetwork',
@@ -99,9 +99,9 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
 function Header({poppinsClass}:{poppinsClass:string}){
   return (
 	<header className="fixed inset-x-0 top-0 z-50 transition bg-transparent data-[scrolled=true]:glass border-b border-transparent data-[scrolled=true]:border-gray-200">
-	  <div className="container-section flex h-16 items-center justify-between">
+		<div className="container-section flex h-20 items-center justify-between">
 		<Link href="/" className={`text-primary font-bold text-lg ${poppinsClass} flex items-center gap-2`} aria-label="ConnectNetwork Home">
-		  <img src="/logo/logo.png" alt="" className="h-6 w-auto" />
+		  <img src="/logo/logo.jpg" alt="ConnectNetwork" className="h-10 md:h-12 w-auto" />
 		  <span className="sr-only">ConnectNetwork</span>
 		</Link>
 		<nav className="hidden md:flex gap-6 text-sm" aria-label="Main Navigation">

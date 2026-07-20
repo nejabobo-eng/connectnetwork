@@ -26,8 +26,8 @@ const products = [
 export default function ProductsClient(){
   return (
 	<div className="container-section py-16">
-	  <h1 className="section-title"><span className="bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent">Our Products</span></h1>
-	  <p className="section-subtitle mt-2">Large visuals with simple, clear information.</p>
+	  <h1 className="section-title"><span className="bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent">Product Packages</span></h1>
+	  <p className="section-subtitle mt-2">Carefully selected packages that provide real value to households. Customers may optionally register as distributors.</p>
 
 	  <div className="grid md:grid-cols-3 gap-6 mt-10">
 		{products.map((p)=> (
@@ -48,16 +48,36 @@ export default function ProductsClient(){
 
 	  <div id="starter-pack" className="card p-8 md:p-12 mt-12 grid md:grid-cols-2 gap-8 items-center">
 		<div>
-		  <h3 className="text-2xl md:text-3xl font-semibold">Starter Pack — R300</h3>
+		  <h3 className="text-2xl md:text-3xl font-semibold">Starter Package</h3>
 		  <ul className="mt-4 space-y-2 text-gray-700">
 			<li>✓ Cleaning products</li>
-			<li>✓ Distributor registration (optional)</li>
-			<li>✓ Access to referral programme</li>
+			<li>✓ Optional distributor registration</li>
+			<li>✓ Access to referral programme (optional)</li>
 			<li>✓ Product support</li>
 		  </ul>
 		</div>
 		<div className="relative h-64 md:h-80">
-		  <Image src="/illustrations/cleaning.svg" alt="Cleaning products" fill className="object-contain p-8 rounded-3xl" sizes="(min-width: 768px) 50vw, 100vw" />
+		  <Image src="/products/starter-pack.jpg" alt="Starter Package" fill className="object-cover rounded-3xl" sizes="(min-width: 768px) 50vw, 100vw" />
+		</div>
+	  </div>
+
+	  <div className="card p-8 md:p-12 mt-8 grid md:grid-cols-2 gap-8 items-center">
+		<div>
+		  <h3 className="text-2xl md:text-3xl font-semibold">Silver Package (Coming Soon)</h3>
+		  <p className="mt-4 text-gray-700">A premium household product package designed for customers seeking additional value.</p>
+		</div>
+		<div className="relative h-64 md:h-80">
+		  <Image src="/illustrations/community.svg" alt="Silver Package (Coming Soon)" fill className="object-contain p-8 rounded-3xl" sizes="(min-width: 768px) 50vw, 100vw" />
+		</div>
+	  </div>
+
+	  <div className="card p-8 md:p-12 mt-8 grid md:grid-cols-2 gap-8 items-center">
+		<div>
+		  <h3 className="text-2xl md:text-3xl font-semibold">Gold Package</h3>
+		  <p className="mt-4 text-gray-700">A premium custom canvas artwork package, featuring professionally produced portraits or landscape artwork for homes, offices, or as meaningful gifts.</p>
+		</div>
+		<div className="relative h-64 md:h-80">
+		  <Image src="/illustrations/referral.svg" alt="Gold Package" fill className="object-contain p-8 rounded-3xl" sizes="(min-width: 768px) 50vw, 100vw" />
 		</div>
 	  </div>
 	</div>

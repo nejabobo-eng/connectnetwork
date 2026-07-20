@@ -17,6 +17,11 @@ export default function FAQPage(){
 	<div className="container-section py-16">
 	  <h1 className="section-title">Frequently Asked Questions</h1>
 	  <FAQClient />
+
+	  <div className="card p-6 mt-8 text-sm text-gray-700">
+		<div className="font-semibold">Important</div>
+		<p className="mt-2">ConnectNetwork is a product distribution company. Purchasing a product package is primarily for the value of the products received. Participation in the distributor programme is optional and referral commissions are paid only in accordance with the current ConnectNetwork Compensation Plan after qualifying purchases have been confirmed.</p>
+	  </div>
 	</div>
   )
 }

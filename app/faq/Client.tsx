@@ -3,9 +3,9 @@ import { useState } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 
 const faqs = [
-  {q:'How much is the Starter Pack?',a:'R300. It includes cleaning products, optional distributor registration, access to the referral programme and product support.'},
+	{q:'How much is the Starter Package?',a:'Package pricing and inclusions are provided in our Product Packages. Customers may optionally register as distributors.'},
   {q:'How do I become a distributor?',a:'Simply contact us after purchasing the Starter Pack and we will guide you through the optional distributor registration.'},
-  {q:'How do commissions work?',a:'Refer a customer and earn R50 commission for each qualifying referral. Commissions are processed at month end.'},
+	{q:'How do commissions work?',a:'Referral commissions are paid in accordance with the current ConnectNetwork Compensation Plan after qualifying purchases are confirmed.'},
   {q:'How long does delivery take?',a:'Delivery times vary by location, especially for rural areas. All orders are tracked until fulfilled.'},
   {q:'Do I have to recruit people?',a:'No. You can simply buy and use the products. Distribution is optional for those who want to earn referral income.'},
   {q:'Can I simply buy products?',a:'Yes. Anyone can purchase products without becoming a distributor.'},

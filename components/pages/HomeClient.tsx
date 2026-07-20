@@ -30,7 +30,7 @@ export default function HomeClient() {
 		<div className="container-section grid md:grid-cols-2 gap-10 items-center min-h-[88vh] py-24">
 		  <motion.div initial={{y:20, opacity:0}} whileInView={{y:0, opacity:1}} viewport={{once:true}} transition={{duration:0.7}}>
 			<h1 className="section-title text-4xl md:text-6xl leading-tight">Connecting Products. Connecting People.</h1>
-			<p className="section-subtitle mt-4 max-w-2xl">Building a trusted South African distribution network for quality household products.</p>
+			<p className="section-subtitle mt-4 max-w-2xl">Building a trusted South African distribution network for quality household products. Customers who wish to may also register as independent distributors.</p>
 			<div className="mt-8 flex gap-4">
 			  <Link href="#learn-more" className="btn btn-primary">Learn More <ArrowRight className="ml-2 h-4 w-4" /></Link>
 			  <Link href="/contact" className="btn btn-ghost">Contact Us</Link>
@@ -73,20 +73,20 @@ export default function HomeClient() {
 		</div>
 	  </section>
 
-	  <section className="container-section py-20" id="starter-pack">
+		<section className="container-section py-20" id="starter-pack">
 		<div className="card p-8 md:p-12 grid md:grid-cols-2 gap-8 items-center">
 		  <div>
-			<h3 className="text-2xl md:text-3xl font-semibold">Starter Pack — R300</h3>
+			<h3 className="text-2xl md:text-3xl font-semibold">Starter Package</h3>
 			<ul className="mt-4 space-y-2 text-gray-700">
 			  <li>✓ Cleaning products</li>
-			  <li>✓ Distributor registration (optional)</li>
-			  <li>✓ Access to referral programme</li>
+				<li>✓ Optional distributor registration</li>
+			  <li>✓ Access to referral programme (optional)</li>
 			  <li>✓ Product support</li>
 			</ul>
-			<Link href="/contact" className="btn btn-primary mt-6">Purchase Starter Pack</Link>
+			<Link href="/contact" className="btn btn-primary mt-6">Contact Us</Link>
 		  </div>
 		  <div className="relative h-64 md:h-80">
-			<Image src="https://images.unsplash.com/photo-1581574209461-2792e91e1ef6?q=80&w=1200&auto=format&fit=crop" alt="Cleaning products" fill className="object-cover rounded-3xl" />
+			<Image src="/products/starter-pack.jpg" alt="Starter Package" fill className="object-cover rounded-3xl" />
 		  </div>
 		</div>
 	  </section>

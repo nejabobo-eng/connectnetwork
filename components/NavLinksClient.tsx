@@ -7,8 +7,8 @@ export default function NavLinksClient(){
   const links = [
 	{href:'/about',label:'About'},
 	{href:'/products',label:'Products'},
-	{href:'/opportunity',label:'Opportunity'},
-	{href:'/compensation',label:'Compensation'},
+	{href:'/opportunity',label:'Become a Distributor'},
+	{href:'/compensation',label:'Distributor Rewards'},
 	{href:'/delivery',label:'Delivery'},
 	{href:'/faq',label:'FAQ'},
 	{href:'/why',label:'Why'},
