@@ -114,7 +114,7 @@ export default function HomeClient() {
 		<section id="distributor-registration" className="container-section py-20" aria-labelledby="distributor-registration-title">
 		  <SectionTitle title="Distributor Registration Information" center />
 		  <div id="distributor-registration-title" className="mt-6 max-w-3xl mx-auto text-gray-700 leading-relaxed">
-			<p className="text-center">To register as a ConnectNetwork Distributor, please send us the following information:</p>
+			<p className="text-center">To register as a ConnectNetwork Distributor, please send us the following information via WhatsApp or email. Once your registration and payment have been confirmed, you will receive your Distributor ID and product package.</p>
 			<ol className="list-decimal pl-6 mt-4 space-y-2">
 			  <li>Full Name and Surname</li>
 			  <li>South African ID Number (or Passport Number if applicable)</li>
@@ -128,6 +128,7 @@ export default function HomeClient() {
 			  <li>Account Type (Cheque or Savings)</li>
 			  <li>Referring Distributor ID (Required)</li>
 			</ol>
+			<p className="mt-3 text-sm text-gray-600"><strong>Banking Details:</strong> These are securely recorded so that any commissions you earn can be paid directly into your bank account according to the ConnectNetwork Commission Plan.</p>
 			<p className="mt-6">Once we receive your information and confirm your payment, we will:</p>
 			<ul className="list-disc pl-6 mt-2 space-y-2">
 			  <li>Register you as a ConnectNetwork Distributor.</li>
