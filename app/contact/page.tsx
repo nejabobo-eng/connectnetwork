@@ -12,7 +12,7 @@ export default function ContactPage(){
 
 		<div className="card p-6 space-y-3 text-sm text-gray-700">
 		  <div><strong>Email:</strong> info@connectnetwork.co.za</div>
-		  <div><strong>Phone (WhatsApp):</strong> <a href="https://wa.me/27745513626" target="_blank" rel="noopener noreferrer">+27 74 551 3626</a></div>
+		  <div><strong>WhatsApp:</strong> <a href="https://wa.me/27745513626?text=Hello%20ConnectNetwork.%20I%20would%20like%20to%20learn%20more%20about%20your%20products%20and%20distributor%20opportunity." target="_blank" rel="noopener noreferrer">Chat with us on WhatsApp</a></div>
 		  <div><strong>Website:</strong> connectnetwork.co.za</div>
 		</div>
 	  </div>

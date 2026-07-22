@@ -75,7 +75,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
 			  <div className="font-semibold mb-3">Contact</div>
 			  <ul className="space-y-2 text-gray-600">
 				<li><a href="mailto:info@connectnetwork.co.za">info@connectnetwork.co.za</a></li>
-				<li><a href="https://wa.me/27745513626" target="_blank" rel="noopener noreferrer">WhatsApp: +27 74 551 3626</a></li>
+				<li><a href="https://wa.me/27745513626?text=Hello%20ConnectNetwork.%20I%20would%20like%20to%20learn%20more%20about%20your%20products%20and%20distributor%20opportunity." target="_blank" rel="noopener noreferrer">Chat with us on WhatsApp</a></li>
 			  </ul>
 			</div>
 		  </div>

@@ -105,8 +105,8 @@ export default function HomeClient() {
 			  <li>✓ Product support</li>
 			</ul>
 			<div className="flex flex-col sm:flex-row gap-3 mt-6">
-			  <Link href="/contact?subject=Request%20Product%20Catalogue" className="btn btn-primary">Request Product Catalogue</Link>
-			  <a href="https://wa.me/27745513626?text=Hi%20ConnectNetwork%2C%20please%20send%20me%20the%20latest%20product%20catalogue." target="_blank" rel="noopener noreferrer" className="btn btn-ghost">Chat on WhatsApp</a>
+			  <a href="https://wa.me/27745513626?text=Hello%20ConnectNetwork.%20Please%20send%20me%20the%20latest%20product%20catalogue." target="_blank" rel="noopener noreferrer" className="btn btn-primary">Chat on WhatsApp</a>
+			  <Link href="/contact?subject=Request%20Product%20Catalogue" className="btn btn-ghost">Request via Email</Link>
 			</div>
 		  </div>
 		</section>

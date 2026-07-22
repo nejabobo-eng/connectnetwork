@@ -99,7 +99,7 @@ export default function ProductsClient(){
 		<p className="mt-4 text-gray-700">Rather than displaying a fixed online catalogue, we provide our latest product information directly to interested customers and registered distributors.</p>
 		<p className="mt-2 text-gray-700">This ensures you always receive the most up-to-date products, pricing, promotions, and availability.</p>
 		<div className="flex flex-col sm:flex-row gap-3 mt-6">
-		  <a href="https://wa.me/27745513626?text=Hi%20ConnectNetwork%2C%20please%20send%20me%20the%20latest%20Distributor%20%26%20Customer%20Product%20Catalogue." target="_blank" rel="noopener noreferrer" className="btn btn-primary">Chat on WhatsApp</a>
+		  <a href="https://wa.me/27745513626?text=Hello%20ConnectNetwork.%20Please%20send%20me%20the%20latest%20Distributor%20%26%20Customer%20Product%20Catalogue." target="_blank" rel="noopener noreferrer" className="btn btn-primary">Chat on WhatsApp</a>
 		  <a href="mailto:info@connectnetwork.co.za?subject=Request%20Distributor%20%26%20Customer%20Product%20Catalogue" className="btn btn-ghost">Request via Email</a>
 		</div>
 	  </div>
