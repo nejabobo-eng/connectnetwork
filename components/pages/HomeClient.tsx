@@ -110,6 +110,54 @@ export default function HomeClient() {
 			</div>
 		  </div>
 		</section>
+
+		<section id="distributor-registration" className="container-section py-20" aria-labelledby="distributor-registration-title">
+		  <SectionTitle title="Distributor Registration Information" center />
+		  <div id="distributor-registration-title" className="mt-6 max-w-3xl mx-auto text-gray-700 leading-relaxed">
+			<p className="text-center">To register as a ConnectNetwork Distributor, please send us the following information:</p>
+			<ol className="list-decimal pl-6 mt-4 space-y-2">
+			  <li>Full Name and Surname</li>
+			  <li>South African ID Number (or Passport Number if applicable)</li>
+			  <li>Mobile Number</li>
+			  <li>Email Address (if available)</li>
+			  <li>Physical Address</li>
+			  <li>Bank Name</li>
+			  <li>Account Holder's Name</li>
+			  <li>Bank Account Number</li>
+			  <li>Branch Code (if applicable)</li>
+			  <li>Account Type (Cheque or Savings)</li>
+			  <li>Referring Distributor ID (Required)</li>
+			</ol>
+			<p className="mt-6">Once we receive your information and confirm your payment, we will:</p>
+			<ul className="list-disc pl-6 mt-2 space-y-2">
+			  <li>Register you as a ConnectNetwork Distributor.</li>
+			  <li>Allocate your unique Distributor ID.</li>
+			  <li>Arrange delivery or collection of your product package.</li>
+			  <li>Send you all the information you need to start promoting ConnectNetwork products.</li>
+			</ul>
+			<p className="mt-6">If you have any questions before registering, please contact us via WhatsApp or email.</p>
+			<div className="flex flex-col sm:flex-row gap-3 mt-6 justify-center">
+			  <a
+				className="btn btn-primary"
+				href="https://wa.me/27745513626?text=I%20would%20like%20to%20register%20as%20a%20ConnectNetwork%20Distributor.%20Here%20are%20my%20details%3A%0A%0AFull%20Name%20and%20Surname%3A%20%0ASouth%20African%20ID%20or%20Passport%3A%20%0AMobile%20Number%3A%20%0AEmail%20Address%20(if%20available)%3A%20%0APhysical%20Address%3A%20%0ABank%20Name%3A%20%0AAccount%20Holder%27s%20Name%3A%20%0ABank%20Account%20Number%3A%20%0ABranch%20Code%20(if%20applicable)%3A%20%0AAccount%20Type%20(Cheque%20or%20Savings)%3A%20%0AReferring%20Distributor%20ID%20(Required)%3A%20"
+				target="_blank"
+				rel="noopener noreferrer"
+			  >
+				Send on WhatsApp
+			  </a>
+			  <Link href="/contact?subject=Distributor%20Registration" className="btn btn-ghost">Email Us</Link>
+			</div>
+		  </div>
+		</section>
+
+		<section className="container-section py-20" aria-labelledby="about-cn">
+		  <SectionTitle title="About ConnectNetwork" center />
+		  <div id="about-cn" className="max-w-4xl mx-auto text-center text-gray-700 mt-6 space-y-4 leading-relaxed">
+			<p>ConnectNetwork is a South African product distribution network connecting manufacturers, suppliers, distributors, and customers.</p>
+			<p>Our mission is to help emerging suppliers grow their businesses while creating income opportunities for distributors through the promotion and distribution of quality products.</p>
+			<p>We are committed to integrity, quality, and building lasting partnerships across South Africa.</p>
+		  </div>
+		</section>
 	</div>
   )
 }
