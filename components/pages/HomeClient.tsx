@@ -62,7 +62,7 @@ export default function HomeClient() {
 		<div className="grid md:grid-cols-4 gap-6 mt-10">
 			{[
 			{title:'Purchase the Starter Pack',img:'/illustrations/distribution.svg'},
-			{title:'Receive your cleaning products',img:'/illustrations/cleaning.svg'},
+			{title:'Receive your products',img:'/illustrations/cleaning.svg'},
 			{title:'Use or recommend them',img:'/illustrations/community.svg'},
 			{title:'Earn commission for referrals',img:'/illustrations/referral.svg'},
 		  ].map((s,i)=> (

@@ -22,7 +22,7 @@ export default function AboutPage(){
 		  <h2 className="font-semibold text-xl">How it Works (English)</h2>
 		  <ol className="mt-3 list-decimal pl-5 space-y-2 text-gray-700">
 			<li>Purchase the ConnectNetwork Starter Pack.</li>
-			<li>Receive your cleaning products.</li>
+			<li>Receive your products.</li>
 			<li>Use them or recommend them to others.</li>
 			<li>Earn commission for qualifying referrals if you choose to become a distributor.</li>
 		  </ol>
