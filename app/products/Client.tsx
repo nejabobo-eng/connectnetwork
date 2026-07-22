@@ -4,20 +4,23 @@ import { motion } from 'framer-motion'
 
 const categories = [
   { name: 'Household Cleaning Products', icon: '/illustrations/cleaning.svg' },
-  { name: 'Personal Care Products', icon: '/illustrations/community.svg' },
-  { name: 'Food & Beverages', icon: '/illustrations/referral.svg' },
+  { name: 'Home & Lifestyle Products', icon: '/illustrations/community.svg' },
+  { name: 'Arts & Décor', icon: '/illustrations/referral.svg' },
   { name: 'Agricultural Products', icon: '/illustrations/distribution.svg' },
   { name: 'Office & School Supplies', icon: '/illustrations/community.svg' },
-  { name: 'Health & Wellness Products', icon: '/illustrations/referral.svg' },
+  { name: 'Food & Beverage Products', icon: '/illustrations/referral.svg' },
+  { name: 'Health & Wellness Products', icon: '/illustrations/community.svg' },
 ]
 
 export default function ProductsClient(){
   return (
 	<div className="container-section py-16">
-		<h1 className="section-title"><span className="bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent">Our Product Categories</span></h1>
-	  <p className="section-subtitle mt-2">ConnectNetwork works with South African manufacturers and suppliers to distribute quality products through our growing network.</p>
+	  <h1 className="section-title"><span className="bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent">Our Product Categories</span></h1>
+	  <p className="section-subtitle mt-2">ConnectNetwork partners with South African manufacturers and suppliers to distribute quality products through our growing network of distributors.</p>
+	  <p className="text-gray-700 mt-2">Our product range continues to expand as we welcome new suppliers and introduce new product lines.</p>
+	  <div className="text-sm text-gray-500 mt-4">Current categories include:</div>
 
-		<div className="grid sm:grid-cols-2 md:grid-cols-3 gap-6 mt-10">
+	  <div className="grid sm:grid-cols-2 md:grid-cols-3 gap-6 mt-4">
 		{categories.map((c)=> (
 		  <motion.article className="card p-6 flex items-center gap-4 hover:-translate-y-0.5 hover:shadow-lg transition" key={c.name} initial={{y:12,opacity:0}} whileInView={{y:0,opacity:1}} viewport={{once:true}}>
 			<div className="relative h-14 w-14">
@@ -28,12 +31,13 @@ export default function ProductsClient(){
 		))}
 	  </div>
 
-		<div id="catalogue" className="card p-8 md:p-12 mt-12">
-		<h3 className="text-2xl md:text-3xl font-semibold">Request Our Product Catalogue</h3>
-		<p className="mt-4 text-gray-700">Our product catalogue is shared directly with registered distributors and qualified customers via WhatsApp or email. This ensures you always receive the latest products, pricing, and promotions.</p>
+	  <div id="catalogue" className="card p-8 md:p-12 mt-12">
+		<h3 className="text-2xl md:text-3xl font-semibold">Distributor & Customer Product Catalogue</h3>
+		<p className="mt-4 text-gray-700">Rather than displaying a fixed online catalogue, we provide our latest product information directly to interested customers and registered distributors.</p>
+		<p className="mt-2 text-gray-700">This ensures you always receive the most up-to-date products, pricing, promotions, and availability.</p>
 		<div className="flex flex-col sm:flex-row gap-3 mt-6">
-		  <a href="https://wa.me/27745513626?text=Hi%20ConnectNetwork%2C%20please%20send%20me%20the%20latest%20product%20catalogue." target="_blank" rel="noopener noreferrer" className="btn btn-primary">Chat on WhatsApp</a>
-		  <a href="mailto:info@connectnetwork.co.za?subject=Request%20Product%20Catalogue" className="btn btn-ghost">Request via Email</a>
+		  <a href="https://wa.me/27745513626?text=Hi%20ConnectNetwork%2C%20please%20send%20me%20the%20latest%20Distributor%20%26%20Customer%20Product%20Catalogue." target="_blank" rel="noopener noreferrer" className="btn btn-primary">Chat on WhatsApp</a>
+		  <a href="mailto:info@connectnetwork.co.za?subject=Request%20Distributor%20%26%20Customer%20Product%20Catalogue" className="btn btn-ghost">Request via Email</a>
 		</div>
 	  </div>
 
