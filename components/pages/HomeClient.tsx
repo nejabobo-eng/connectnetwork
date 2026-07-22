@@ -96,22 +96,20 @@ export default function HomeClient() {
 	  </section>
 
 		<section className="container-section py-20" id="starter-pack">
-		<div className="card p-8 md:p-12 grid md:grid-cols-2 gap-8 items-center">
-		  <div>
-			<h3 className="text-2xl md:text-3xl font-semibold">Starter Package</h3>
+		  <div className="card p-8 md:p-12 items-start">
+			<h3 className="text-2xl md:text-3xl font-semibold">Request Our Product Catalogue</h3>
 			<ul className="mt-4 space-y-2 text-gray-700">
-			  <li>✓ Cleaning products</li>
-				<li>✓ Optional distributor registration</li>
+			  <li>✓ Genuine products sourced from trusted suppliers</li>
+			  <li>✓ Optional distributor registration</li>
 			  <li>✓ Access to referral programme (optional)</li>
 			  <li>✓ Product support</li>
 			</ul>
-			<Link href="/contact" className="btn btn-primary mt-6">Contact Us</Link>
+			<div className="flex flex-col sm:flex-row gap-3 mt-6">
+			  <Link href="/contact?subject=Request%20Product%20Catalogue" className="btn btn-primary">Request Product Catalogue</Link>
+			  <a href="https://wa.me/27745513626?text=Hi%20ConnectNetwork%2C%20please%20send%20me%20the%20latest%20product%20catalogue." target="_blank" rel="noopener noreferrer" className="btn btn-ghost">Chat on WhatsApp</a>
+			</div>
 		  </div>
-		  <div className="relative h-64 md:h-80">
-			<Image src="/products/starter-pack.jpg" alt="Starter Package" fill className="object-cover rounded-3xl" />
-		  </div>
-		</div>
-	  </section>
+		</section>
 	</div>
   )
 }
