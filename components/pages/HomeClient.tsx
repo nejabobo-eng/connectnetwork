@@ -58,6 +58,27 @@ export default function HomeClient() {
 		</div>
 	  </section>
 
+	<section className="container-section py-12" aria-labelledby="distributor-journey">
+	  <div className="card p-8 text-center">
+		<h3 id="distributor-journey" className="text-xl md:text-2xl font-semibold">Distributor Journey</h3>
+		<div className="mt-4 grid gap-3 text-gray-700">
+		  {[
+			'Register for R300',
+			'Receive Your Distributor ID',
+			'Access the Product Catalogue',
+			'Choose Products to Distribute',
+			'Sell to Customers',
+			'Earn Commission',
+		  ].map((step,i)=> (
+			<div key={step} className="flex items-center justify-center gap-3">
+			  <span>{step}</span>
+			  {i<5 && <span aria-hidden className="text-gray-400">↓</span>}
+			</div>
+		  ))}
+		</div>
+	  </div>
+	</section>
+
 	  <section id="how-it-works" className="container-section py-20">
 		<SectionTitle title="How ConnectNetwork Works" center />
 		<div className="grid md:grid-cols-5 gap-6 mt-10">
@@ -75,6 +96,13 @@ export default function HomeClient() {
 		  ))}
 		</div>
 	  </section>
+
+	<section className="container-section py-20" aria-labelledby="vision">
+	  <SectionTitle title="Building South Africa's Distribution Network" center />
+	  <div id="vision" className="mt-6 max-w-3xl mx-auto text-center text-gray-700 leading-relaxed">
+		Our vision is to connect quality suppliers with motivated distributors, creating opportunities for businesses to grow and communities to access great products.
+	  </div>
+	</section>
 
 		<section className="bg-gray-50 py-20">
 		<div className="container-section">

@@ -59,6 +59,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
 				<li><Link href="/about">About</Link></li>
 				<li><Link href="/products">Products</Link></li>
 				<li><Link href="/#distributor-registration">Become a Distributor</Link></li>
+				<li><Link href="/suppliers">Suppliers</Link></li>
 				<li><Link href="/#how-it-works">How It Works</Link></li>
 				<li><Link href="/#commission">Commission</Link></li>
 			  </ul>

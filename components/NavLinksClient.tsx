@@ -9,6 +9,7 @@ export default function NavLinksClient(){
 	{href:'/#distributor-registration',label:'Become a Distributor'},
 	{href:'/#how-it-works',label:'How It Works'},
 	{href:'/#commission',label:'Commission'},
+	{href:'/suppliers',label:'Suppliers'},
 	{href:'/about',label:'About'},
   ]
   return (
