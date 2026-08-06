@@ -30,13 +30,14 @@ export default function HomeClient() {
 		<div className="container-section grid md:grid-cols-2 gap-10 items-center min-h-[88vh] py-24">
 			<motion.div initial={{y:20, opacity:0}} whileInView={{y:0, opacity:1}} viewport={{once:true}} transition={{duration:0.7}}>
 			<img src="/logo/logo.jpg" alt="ConnectNetwork logo" className="h-16 md:h-24 w-auto mb-4" />
-			<h1 className="section-title text-4xl md:text-6xl leading-tight">Become a Product Distributor. Earn Every Time You Sell.</h1>
+			<h1 className="section-title text-4xl md:text-6xl leading-tight">Become a ConnectNetwork Distributor</h1>
 			<p className="section-subtitle mt-4 max-w-2xl">
-			  Register once and become an official ConnectNetwork Distributor. Distribute quality products across South Africa and earn commission on every successful sale.
+			  Register once for only R300 and distribute quality products across South Africa. Earn commission on every successful sale.
 			</p>
 			<div className="mt-8 flex gap-4">
-			  <Link href="/#distributor-registration" className="btn btn-primary">Become a Distributor <ArrowRight className="ml-2 h-4 w-4" /></Link>
-			  <Link href="/products" className="btn btn-ghost">Browse Products</Link>
+			  <Link href="/#distributor-registration" className="btn btn-primary">Become a Distributor for R300 <ArrowRight className="ml-2 h-4 w-4" /></Link>
+			  <Link href="/products" className="btn btn-ghost">View Product Categories</Link>
+			  <Link href="/#how-it-works" className="btn btn-ghost">How It Works</Link>
 			</div>
 			  <div className="mt-6 grid grid-cols-1 sm:grid-cols-3 gap-3 text-sm text-gray-700" aria-label="Key assurances">
 			  {[
@@ -59,12 +60,13 @@ export default function HomeClient() {
 
 	  <section id="how-it-works" className="container-section py-20">
 		<SectionTitle title="How ConnectNetwork Works" center />
-		<div className="grid md:grid-cols-4 gap-6 mt-10">
+		<div className="grid md:grid-cols-5 gap-6 mt-10">
 		  {[
-			{n:'1. Register Once', d:'Complete a simple registration and become an official distributor.'},
-			{n:'2. Get Approved', d:'Receive your Distributor ID and access available products.'},
-			{n:'3. Distribute Products', d:'Share and sell products to customers, businesses, churches and communities.'},
-			{n:'4. Earn Commission', d:'Receive commission for every successful product distributed.'},
+			{n:'1. Register (R300)', d:'Register as a Distributor for a once-off fee of R300.'},
+			{n:'2. Receive ID', d:'Get your unique Distributor ID and access the catalogue.'},
+			{n:'3. Choose Products', d:'Select products from the ConnectNetwork catalogue.'},
+			{n:'4. Sell to Customers', d:'Distribute to customers anywhere in South Africa.'},
+			{n:'5. Earn Commission', d:'Earn commission on every successful sale.'},
 		  ].map((s,i)=> (
 			<motion.div key={i} className="card p-6 hover:shadow-lg transition hover:-translate-y-0.5" initial={{y:16,opacity:0}} whileInView={{y:0,opacity:1}} viewport={{once:true}} transition={{delay:i*0.05}}>
 			  <div className="text-primary font-semibold">{s.n}</div>
@@ -76,10 +78,11 @@ export default function HomeClient() {
 
 		<section className="bg-gray-50 py-20">
 		<div className="container-section">
-		  <SectionTitle title="Why Become a Distributor?" center />
+		  <SectionTitle title="Why Join ConnectNetwork?" center />
 		  <div className="card p-8 mt-10">
 			<ul className="grid md:grid-cols-2 gap-3 text-gray-700">
 			  {[
+				'One-time registration fee of only R300',
 				'Register only once',
 				'No monthly membership fees',
 				'Sell real products',
@@ -99,21 +102,22 @@ export default function HomeClient() {
 	  <section id="commission" className="container-section py-20">
 		<SectionTitle title="Earn From Every Distribution" center />
 		<div className="mt-6 max-w-3xl mx-auto text-center text-gray-700 leading-relaxed">
-		  Every product has a commission value. The more products you distribute, the more commission you earn. There is no limit to how much you can earn.
+		  Every product has its own commission value, which is displayed in the Distributor Catalogue. Your commission is earned on every successful sale.
 		</div>
 	  </section>
 
 	  <section className="container-section py-20" aria-labelledby="products-overview">
 		<SectionTitle title="Distribute Products People Need" center />
 		<div id="products-overview" className="mt-6 max-w-3xl mx-auto text-center text-gray-700 leading-relaxed">
-		  Instead of promoting recruitment, we promote products.
+		  ConnectNetwork is continually expanding its range of products. As our catalogue grows, distributors will have access to more opportunities to serve customers and earn commission.
 		  <div className="mt-4 grid sm:grid-cols-2 gap-3 text-sm">
 			{['Cleaning Products','Coffee','Fertilizer','Stationery','Poultry Products','Household Goods'].map(x=> (
 			  <div key={x} className="card p-4">{x}</div>
 			))}
 		  </div>
-		  <div className="mt-6">
-			<Link href="/products" className="btn btn-ghost">Browse all products</Link>
+		  <div className="mt-6 flex items-center gap-3 justify-center">
+			<span className="text-xs uppercase tracking-wide text-gray-600 bg-gray-100 px-2 py-1 rounded-full">More Products Coming Soon</span>
+			<Link href="/products" className="btn btn-ghost">View Product Categories</Link>
 		  </div>
 		</div>
 	  </section>
@@ -161,17 +165,12 @@ export default function HomeClient() {
 		  </div>
 		</section>
 
-		<section className="container-section py-20" id="starter-pack">
+		<section className="container-section py-20" id="catalogue">
 		  <div className="card p-8 md:p-12 items-start">
-			<h3 className="text-2xl md:text-3xl font-semibold">Request Our Product Catalogue</h3>
-			<ul className="mt-4 space-y-2 text-gray-700">
-			  <li>✓ Genuine products sourced from trusted suppliers</li>
-			  <li>✓ Optional distributor registration</li>
-			  <li>✓ Access to referral programme (optional)</li>
-			  <li>✓ Product support</li>
-			</ul>
+			<h3 className="text-2xl md:text-3xl font-semibold">Distributor Catalogue</h3>
+			<p className="mt-4 text-gray-700">Registered distributors receive access to the ConnectNetwork product catalogue. While the online catalogue is being finalized, you can request the latest catalogue directly from us.</p>
 			<div className="flex flex-col sm:flex-row gap-3 mt-6">
-			  <a href="https://wa.me/27745513626?text=Hello%20ConnectNetwork.%20Please%20send%20me%20the%20latest%20product%20catalogue." target="_blank" rel="noopener noreferrer" className="btn btn-primary">Chat on WhatsApp</a>
+			  <a href="https://wa.me/27745513626?text=Hello%20ConnectNetwork.%20Please%20send%20me%20the%20latest%20product%20catalogue." target="_blank" rel="noopener noreferrer" className="btn btn-primary">Request on WhatsApp</a>
 			  <Link href="/contact?subject=Request%20Product%20Catalogue" className="btn btn-ghost">Request via Email</Link>
 			</div>
 		  </div>
@@ -180,7 +179,7 @@ export default function HomeClient() {
 		<section id="distributor-registration" className="container-section py-20" aria-labelledby="distributor-registration-title">
 		  <SectionTitle title="Distributor Registration Information" center />
 		  <div id="distributor-registration-title" className="mt-6 max-w-3xl mx-auto text-gray-700 leading-relaxed">
-			<p className="text-center">To register as a ConnectNetwork Distributor, please send us the following information via WhatsApp or email. Once your registration and payment have been confirmed, you will receive your Distributor ID and product package.</p>
+			<p className="text-center">To register as a ConnectNetwork Distributor, please send us the following information via WhatsApp or email. The once-off registration fee is R300. Once your registration and payment have been confirmed, you will receive your Distributor ID and access to the product catalogue.</p>
 			<ol className="list-decimal pl-6 mt-4 space-y-2">
 			  <li>Full Name and Surname</li>
 			  <li>South African ID Number (or Passport Number if applicable)</li>
@@ -194,13 +193,23 @@ export default function HomeClient() {
 			  <li>Account Type (Cheque or Savings)</li>
 			  <li>Referring Distributor ID (Required)</li>
 			</ol>
+			<div className="card p-6 mt-6">
+			  <div className="font-semibold">Your Once-Off R300 Registration Includes</div>
+			  <ul className="list-disc pl-6 mt-2 space-y-1 text-sm">
+				<li>Official ConnectNetwork Distributor registration</li>
+				<li>Unique Distributor ID</li>
+				<li>Access to the Distributor Product Catalogue</li>
+				<li>Distributor resources and future product updates</li>
+				<li>Lifetime distributor status (subject to Terms & Conditions)</li>
+			  </ul>
+			</div>
 			<p className="mt-3 text-sm text-gray-600"><strong>Banking Details:</strong> These are securely recorded so that any commissions you earn can be paid directly into your bank account according to the ConnectNetwork Commission Plan.</p>
 			<p className="mt-6">Once we receive your information and confirm your payment, we will:</p>
 			<ul className="list-disc pl-6 mt-2 space-y-2">
 			  <li>Register you as a ConnectNetwork Distributor.</li>
 			  <li>Allocate your unique Distributor ID.</li>
-			  <li>Arrange delivery or collection of your product package.</li>
-			  <li>Send you all the information you need to start promoting ConnectNetwork products.</li>
+			  <li>Grant you access to the Distributor Catalogue.</li>
+			  <li>Send you all the information you need to start distributing ConnectNetwork products.</li>
 			</ul>
 			<p className="mt-6">If you have any questions before registering, please contact us via WhatsApp or email.</p>
 			<div className="flex flex-col sm:flex-row gap-3 mt-6 justify-center">
