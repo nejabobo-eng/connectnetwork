@@ -83,13 +83,12 @@ export default function HomeClient() {
 			<ul className="grid md:grid-cols-2 gap-3 text-gray-700">
 			  {[
 				'One-time registration fee of only R300',
-				'Register only once',
 				'No monthly membership fees',
-				'Sell real products',
-				'Earn commission on every sale',
-				'Work at your own pace',
-				'Build your own customer base',
-				'Multiple product categories',
+				'Access to a growing range of products',
+				'Earn commission on every successful sale',
+				'Work full-time or part-time',
+				'Register once and remain a distributor',
+				'Equal opportunity for every distributor',
 				'Nationwide opportunity',
 			  ].map(item=> (
 				<li key={item} className="flex items-start gap-2"><CheckCircle className="h-4 w-4 text-green-600 mt-0.5" aria-hidden /><span>{item}</span></li>
@@ -105,6 +104,15 @@ export default function HomeClient() {
 		  Every product has its own commission value, which is displayed in the Distributor Catalogue. Your commission is earned on every successful sale.
 		</div>
 	  </section>
+
+	<section className="container-section py-20" aria-labelledby="who-can-join">
+	<SectionTitle title="Who Can Join?" center />
+	<div id="who-can-join" className="mt-6 grid sm:grid-cols-2 md:grid-cols-3 gap-4">
+	  {['Individuals','Students','Entrepreneurs','Churches','Community Organisations','Small Businesses','Anyone aged 18 years or older'].map(x=> (
+		<div key={x} className="card p-4 text-center text-gray-700">{x}</div>
+	  ))}
+	</div>
+  </section>
 
 	  <section className="container-section py-20" aria-labelledby="products-overview">
 		<SectionTitle title="Distribute Products People Need" center />
