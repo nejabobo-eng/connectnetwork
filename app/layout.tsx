@@ -10,19 +10,19 @@ const poppins = Poppins({ subsets: ['latin'], weight: ['600','700','800'] })
 const inter = Inter({ subsets: ['latin'] })
 
 export const metadata: Metadata = {
-  title: 'ConnectNetwork — Connecting Products. Connecting People.',
-  description: 'South African distribution network connecting quality household products with customers through independent distributors.',
+	title: 'ConnectNetwork — Connecting Quality Products with Customers Through Independent Distributors.',
+  description: 'South Africa\'s product distribution company. Register once, distribute products, and earn commission on every successful sale.',
   openGraph: {
-	title: 'ConnectNetwork — Connecting Products. Connecting People.',
-	description: 'South African distribution network connecting quality household products with customers through independent distributors.',
+		title: 'ConnectNetwork — Connecting Quality Products with Customers Through Independent Distributors.',
+		description: 'South Africa\'s product distribution company. Register once, distribute products, and earn commission on every successful sale.',
 	url: 'https://connectnetwork.co.za',
 	siteName: 'ConnectNetwork',
 	type: 'website'
   },
-  twitter: {
+	twitter: {
 	card: 'summary_large_image',
 	title: 'ConnectNetwork',
-	description: 'Connecting Products. Connecting People.'
+	description: 'Register once. Distribute products. Earn commission on every sale.'
   },
   metadataBase: new URL('https://connectnetwork.co.za')
 }
@@ -54,12 +54,13 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
 				<p className="text-gray-600">Quality Products • Trusted Distribution • Growing Together</p>
 			</div>
 			<div>
-				<div className="font-semibold mb-3">Company</div>
+			  <div className="font-semibold mb-3">Company</div>
 			  <ul className="space-y-2 text-gray-600">
 				<li><Link href="/about">About</Link></li>
 				<li><Link href="/products">Products</Link></li>
-				<li><Link href="/opportunity">Opportunity</Link></li>
-				  <li><Link href="/why">Why ConnectNetwork?</Link></li>
+				<li><Link href="/#distributor-registration">Become a Distributor</Link></li>
+				<li><Link href="/#how-it-works">How It Works</Link></li>
+				<li><Link href="/#commission">Commission</Link></li>
 			  </ul>
 			</div>
 			<div>
@@ -123,16 +124,14 @@ function MobileMenu({poppinsClass}:{poppinsClass:string}){
 	  <summary className="list-none p-2 rounded-lg hover:bg-gray-100 cursor-pointer" aria-label="Open menu">
 		<Menu aria-hidden className="h-6 w-6" />
 	  </summary>
-	  <div className="absolute right-4 mt-2 w-60 card p-3">
-		<a className="block px-3 py-2 rounded-lg hover:bg-gray-50" href="/about">About</a>
-		<a className="block px-3 py-2 rounded-lg hover:bg-gray-50" href="/products">Products</a>
-		<a className="block px-3 py-2 rounded-lg hover:bg-gray-50" href="/opportunity">Opportunity</a>
-		<a className="block px-3 py-2 rounded-lg hover:bg-gray-50" href="/compensation">Compensation</a>
-		<a className="block px-3 py-2 rounded-lg hover:bg-gray-50" href="/delivery">Delivery</a>
-		<a className="block px-3 py-2 rounded-lg hover:bg-gray-50" href="/faq">FAQ</a>
-		<a className="block px-3 py-2 rounded-lg hover:bg-gray-50" href="/why">Why</a>
-		<a className="block px-3 py-2 rounded-full btn btn-primary mt-2 text-center" href="/contact">Contact</a>
-	  </div>
+		<div className="absolute right-4 mt-2 w-60 card p-3">
+			<a className="block px-3 py-2 rounded-lg hover:bg-gray-50" href="/products">Products</a>
+			<a className="block px-3 py-2 rounded-lg hover:bg-gray-50" href="/#distributor-registration">Become a Distributor</a>
+			<a className="block px-3 py-2 rounded-lg hover:bg-gray-50" href="/#how-it-works">How It Works</a>
+			<a className="block px-3 py-2 rounded-lg hover:bg-gray-50" href="/#commission">Commission</a>
+			<a className="block px-3 py-2 rounded-lg hover:bg-gray-50" href="/about">About</a>
+			<a className="block px-3 py-2 rounded-full btn btn-primary mt-2 text-center" href="/contact">Contact</a>
+		  </div>
 	</details>
   )
 }

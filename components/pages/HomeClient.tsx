@@ -30,13 +30,13 @@ export default function HomeClient() {
 		<div className="container-section grid md:grid-cols-2 gap-10 items-center min-h-[88vh] py-24">
 			<motion.div initial={{y:20, opacity:0}} whileInView={{y:0, opacity:1}} viewport={{once:true}} transition={{duration:0.7}}>
 			<img src="/logo/logo.jpg" alt="ConnectNetwork logo" className="h-16 md:h-24 w-auto mb-4" />
-			<h1 className="section-title text-4xl md:text-6xl leading-tight">Connecting Products. Connecting People.</h1>
+			<h1 className="section-title text-4xl md:text-6xl leading-tight">Become a Product Distributor. Earn Every Time You Sell.</h1>
 			<p className="section-subtitle mt-4 max-w-2xl">
-			  A South African distribution company supplying quality household products. Choose to use the products or become a distributor and earn referral rewards under our Distributor Rewards Plan.
+			  Register once and become an official ConnectNetwork Distributor. Distribute quality products across South Africa and earn commission on every successful sale.
 			</p>
 			<div className="mt-8 flex gap-4">
-			  <Link href="#learn-more" className="btn btn-primary">Learn More <ArrowRight className="ml-2 h-4 w-4" /></Link>
-			  <Link href="/contact" className="btn btn-ghost">Contact Us</Link>
+			  <Link href="/#distributor-registration" className="btn btn-primary">Become a Distributor <ArrowRight className="ml-2 h-4 w-4" /></Link>
+			  <Link href="/products" className="btn btn-ghost">Browse Products</Link>
 			</div>
 			  <div className="mt-6 grid grid-cols-1 sm:grid-cols-3 gap-3 text-sm text-gray-700" aria-label="Key assurances">
 			  {[
@@ -57,20 +57,18 @@ export default function HomeClient() {
 		</div>
 	  </section>
 
-	  <section id="learn-more" className="container-section py-20">
+	  <section id="how-it-works" className="container-section py-20">
 		<SectionTitle title="How ConnectNetwork Works" center />
 		<div className="grid md:grid-cols-4 gap-6 mt-10">
-			{[
-			{title:'Purchase the Starter Pack',img:'/illustrations/distribution.svg'},
-			{title:'Receive your products',img:'/illustrations/cleaning.svg'},
-			{title:'Use or recommend them',img:'/illustrations/community.svg'},
-			{title:'Earn commission for referrals',img:'/illustrations/referral.svg'},
+		  {[
+			{n:'1. Register Once', d:'Complete a simple registration and become an official distributor.'},
+			{n:'2. Get Approved', d:'Receive your Distributor ID and access available products.'},
+			{n:'3. Distribute Products', d:'Share and sell products to customers, businesses, churches and communities.'},
+			{n:'4. Earn Commission', d:'Receive commission for every successful product distributed.'},
 		  ].map((s,i)=> (
-			<motion.div key={i} className="card p-5 hover:shadow-lg transition hover:-translate-y-0.5" initial={{y:16,opacity:0}} whileInView={{y:0,opacity:1}} viewport={{once:true}} transition={{delay:i*0.05}}>
-				<div className="relative h-40 w-full mb-4">
-				<Image src={s.img} alt="" fill className="object-contain p-6" />
-			  </div>
-			  <div className="font-semibold">{s.title}</div>
+			<motion.div key={i} className="card p-6 hover:shadow-lg transition hover:-translate-y-0.5" initial={{y:16,opacity:0}} whileInView={{y:0,opacity:1}} viewport={{once:true}} transition={{delay:i*0.05}}>
+			  <div className="text-primary font-semibold">{s.n}</div>
+			  <div className="text-gray-700 mt-2 text-sm">{s.d}</div>
 			</motion.div>
 		  ))}
 		</div>
@@ -78,12 +76,44 @@ export default function HomeClient() {
 
 		<section className="bg-gray-50 py-20">
 		<div className="container-section">
-		  <SectionTitle title="Why ConnectNetwork?" center />
-		  <div className="grid md:grid-cols-4 gap-6 mt-10">
-			<FeatureCard icon={<PackageCheck className="h-6 w-6 text-primary" />} title="Quality Products" desc="Products used every day." />
-			<FeatureCard icon={<Users className="h-6 w-6 text-primary" />} title="Nationwide Network" desc="Growing distribution throughout South Africa." />
-			<FeatureCard icon={<HandCoins className="h-6 w-6 text-primary" />} title="Extra Income" desc="Optional opportunity to earn referral commissions." />
-			<FeatureCard icon={<Users className="h-6 w-6 text-primary" />} title="Community" desc="Helping ordinary South Africans build sustainable income." />
+		  <SectionTitle title="Why Become a Distributor?" center />
+		  <div className="card p-8 mt-10">
+			<ul className="grid md:grid-cols-2 gap-3 text-gray-700">
+			  {[
+				'Register only once',
+				'No monthly membership fees',
+				'Sell real products',
+				'Earn commission on every sale',
+				'Work at your own pace',
+				'Build your own customer base',
+				'Multiple product categories',
+				'Nationwide opportunity',
+			  ].map(item=> (
+				<li key={item} className="flex items-start gap-2"><CheckCircle className="h-4 w-4 text-green-600 mt-0.5" aria-hidden /><span>{item}</span></li>
+			  ))}
+			</ul>
+		  </div>
+		</div>
+	  </section>
+
+	  <section id="commission" className="container-section py-20">
+		<SectionTitle title="Earn From Every Distribution" center />
+		<div className="mt-6 max-w-3xl mx-auto text-center text-gray-700 leading-relaxed">
+		  Every product has a commission value. The more products you distribute, the more commission you earn. There is no limit to how much you can earn.
+		</div>
+	  </section>
+
+	  <section className="container-section py-20" aria-labelledby="products-overview">
+		<SectionTitle title="Distribute Products People Need" center />
+		<div id="products-overview" className="mt-6 max-w-3xl mx-auto text-center text-gray-700 leading-relaxed">
+		  Instead of promoting recruitment, we promote products.
+		  <div className="mt-4 grid sm:grid-cols-2 gap-3 text-sm">
+			{['Cleaning Products','Coffee','Fertilizer','Stationery','Poultry Products','Household Goods'].map(x=> (
+			  <div key={x} className="card p-4">{x}</div>
+			))}
+		  </div>
+		  <div className="mt-6">
+			<Link href="/products" className="btn btn-ghost">Browse all products</Link>
 		  </div>
 		</div>
 	  </section>
@@ -94,6 +124,42 @@ export default function HomeClient() {
 		  At ConnectNetwork, we are committed to supplying quality products, treating our customers and distributors with honesty and respect, and building a sustainable distribution network that creates value for everyone involved. We believe long-term success is built on trust, reliable service, and products that people genuinely use and appreciate.
 		</div>
 	  </section>
+
+		<section className="container-section py-20" aria-labelledby="faq">
+		  <SectionTitle title="Frequently Asked Questions" center />
+		  <div id="faq" className="mt-6 grid md:grid-cols-2 gap-6">
+			<div className="card p-6">
+			  <div className="font-semibold">Do I register every year?</div>
+			  <div className="text-gray-700 mt-1 text-sm">No. Registration is once-off.</div>
+			</div>
+			<div className="card p-6">
+			  <div className="font-semibold">Can I distribute many products?</div>
+			  <div className="text-gray-700 mt-1 text-sm">Yes. You can distribute any approved ConnectNetwork products.</div>
+			</div>
+			<div className="card p-6">
+			  <div className="font-semibold">How do I earn?</div>
+			  <div className="text-gray-700 mt-1 text-sm">You earn commission on every successful product you distribute.</div>
+			</div>
+			<div className="card p-6">
+			  <div className="font-semibold">Is there a monthly fee?</div>
+			  <div className="text-gray-700 mt-1 text-sm">No.</div>
+			</div>
+			<div className="card p-6">
+			  <div className="font-semibold">Can I work part-time?</div>
+			  <div className="text-gray-700 mt-1 text-sm">Yes. You decide how much you want to distribute.</div>
+			</div>
+		  </div>
+		</section>
+
+		<section className="container-section py-20" aria-labelledby="cta-join">
+		  <div className="card p-8 md:p-12 text-center">
+			<h3 id="cta-join" className="text-2xl md:text-3xl font-semibold">Ready to Start Earning?</h3>
+			<p className="mt-3 text-gray-700">Become an official ConnectNetwork Distributor today and start earning commission by distributing quality products across South Africa.</p>
+			<div className="mt-6 flex justify-center">
+			  <Link href="/#distributor-registration" className="btn btn-primary">Register as a Distributor</Link>
+			</div>
+		  </div>
+		</section>
 
 		<section className="container-section py-20" id="starter-pack">
 		  <div className="card p-8 md:p-12 items-start">

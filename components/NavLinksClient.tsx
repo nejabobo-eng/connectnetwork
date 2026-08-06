@@ -5,13 +5,11 @@ import { usePathname } from 'next/navigation'
 export default function NavLinksClient(){
   const pathname = usePathname()
   const links = [
-	{href:'/about',label:'About'},
 	{href:'/products',label:'Products'},
-	{href:'/opportunity',label:'Become a Distributor'},
-	{href:'/compensation',label:'Distributor Rewards'},
-	{href:'/delivery',label:'Delivery'},
-	{href:'/faq',label:'FAQ'},
-	{href:'/why',label:'Why'},
+	{href:'/#distributor-registration',label:'Become a Distributor'},
+	{href:'/#how-it-works',label:'How It Works'},
+	{href:'/#commission',label:'Commission'},
+	{href:'/about',label:'About'},
   ]
   return (
 	<>
