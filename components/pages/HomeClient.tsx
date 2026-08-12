@@ -52,8 +52,15 @@ export default function HomeClient() {
 			  ))}
 			</div>
 		  </motion.div>
-		  <motion.div className="relative h-[420px] md:h-[520px]" initial={{scale:0.96, opacity:0}} whileInView={{scale:1, opacity:1}} viewport={{once:true}} transition={{duration:0.8}}>
-			<SupplyChainIllustration />
+			<motion.div className="relative flex items-center justify-center p-6" initial={{scale:0.98, opacity:0}} whileInView={{scale:1, opacity:1}} viewport={{once:true}} transition={{duration:0.8}}>
+			<motion.img src="/logo/logo.jpg" alt="ConnectNetwork logo" className="w-56 h-56 md:w-80 md:h-80 object-contain rounded-lg bg-white/80 p-6 shadow-lg"
+			  initial={{y:0}}
+			  animate={{y:[0,-10,0]}}
+			  transition={{duration:3, repeat:Infinity, repeatType:'loop'}}
+			/>
+			<div className="absolute bottom-6 text-center">
+			  <div className="text-sm text-gray-700 font-semibold">Connecting Suppliers. Empowering Distributors.</div>
+			</div>
 		  </motion.div>
 		</div>
 	  </section>
