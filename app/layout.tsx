@@ -10,11 +10,11 @@ const poppins = Poppins({ subsets: ['latin'], weight: ['600','700','800'] })
 const inter = Inter({ subsets: ['latin'] })
 
 export const metadata: Metadata = {
-  title: 'ConnectNetwork — Connecting Products. Connecting People.',
-  description: 'South African distribution network connecting quality household products with customers through independent distributors.',
+  title: 'ConnectNetwork — Business Promotion & Marketing Service',
+  description: 'ConnectNetwork helps businesses promote their businesses, products and services to a wider audience through our network, connections and marketing capabilities.',
   openGraph: {
-	title: 'ConnectNetwork — Connecting Products. Connecting People.',
-	description: 'South African distribution network connecting quality household products with customers through independent distributors.',
+	title: 'ConnectNetwork — Get Your Business Seen.',
+	description: 'Business promotion and marketing service for startups, small businesses and established businesses.',
 	url: 'https://connectnetwork.co.za',
 	siteName: 'ConnectNetwork',
 	type: 'website'
@@ -22,7 +22,7 @@ export const metadata: Metadata = {
   twitter: {
 	card: 'summary_large_image',
 	title: 'ConnectNetwork',
-	description: 'Connecting Products. Connecting People.'
+	description: 'Get Your Business Seen. Business Promotion Service.'
   },
   metadataBase: new URL('https://connectnetwork.co.za')
 }
@@ -35,12 +35,13 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
 		{/* JSON-LD Organization schema */}
 		<script type="application/ld+json" dangerouslySetInnerHTML={{__html: JSON.stringify({
 		  '@context': 'https://schema.org',
-		  '@type': 'Organization',
+		  '@type': 'LocalBusiness',
 		  name: 'ConnectNetwork',
 		  url: 'https://connectnetwork.co.za',
 		  email: 'info@connectnetwork.co.za',
-			logo: 'https://connectnetwork.co.za/logo/logo.jpg',
-		  sameAs: []
+		  logo: 'https://connectnetwork.co.za/logo/logo.jpg',
+		  description: 'Business promotion and marketing service for startups, small businesses and established businesses.',
+		  areaServed: "ZA"
 		}) }} />
 		<main className="pt-16 transition-opacity duration-200" id="main">
 		  {children}
@@ -51,15 +52,16 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
 			<div className="container-section grid md:grid-cols-4 gap-8 py-12 text-sm relative">
 			<div>
 			  <div className={`text-primary font-bold text-lg mb-2 ${poppins.className}`}>ConnectNetwork</div>
-				<p className="text-gray-600">Quality Products • Trusted Distribution • Growing Together</p>
+			  <p className="text-gray-600">Business Promotion • Marketing Service • Grow Your Business</p>
 			</div>
 			<div>
-				<div className="font-semibold mb-3">Company</div>
+			  <div className="font-semibold mb-3">Navigate</div>
 			  <ul className="space-y-2 text-gray-600">
+				<li><Link href="/">Home</Link></li>
+				<li><Link href="/products">What We Promote</Link></li>
+				<li><Link href="/why">Why ConnectNetwork?</Link></li>
 				<li><Link href="/about">About</Link></li>
-				<li><Link href="/products">Products</Link></li>
-				<li><Link href="/opportunity">Opportunity</Link></li>
-				  <li><Link href="/why">Why ConnectNetwork?</Link></li>
+				<li><Link href="/faq">FAQ</Link></li>
 			  </ul>
 			</div>
 			<div>
@@ -124,14 +126,12 @@ function MobileMenu({poppinsClass}:{poppinsClass:string}){
 		<Menu aria-hidden className="h-6 w-6" />
 	  </summary>
 	  <div className="absolute right-4 mt-2 w-60 card p-3">
+		<a className="block px-3 py-2 rounded-lg hover:bg-gray-50" href="/">Home</a>
+		<a className="block px-3 py-2 rounded-lg hover:bg-gray-50" href="/products">What We Promote</a>
+		<a className="block px-3 py-2 rounded-lg hover:bg-gray-50" href="/why">Why ConnectNetwork</a>
 		<a className="block px-3 py-2 rounded-lg hover:bg-gray-50" href="/about">About</a>
-		<a className="block px-3 py-2 rounded-lg hover:bg-gray-50" href="/products">Products</a>
-		<a className="block px-3 py-2 rounded-lg hover:bg-gray-50" href="/opportunity">Opportunity</a>
-		<a className="block px-3 py-2 rounded-lg hover:bg-gray-50" href="/compensation">Compensation</a>
-		<a className="block px-3 py-2 rounded-lg hover:bg-gray-50" href="/delivery">Delivery</a>
 		<a className="block px-3 py-2 rounded-lg hover:bg-gray-50" href="/faq">FAQ</a>
-		<a className="block px-3 py-2 rounded-lg hover:bg-gray-50" href="/why">Why</a>
-		<a className="block px-3 py-2 rounded-full btn btn-primary mt-2 text-center" href="/contact">Contact</a>
+		<a className="block px-3 py-2 rounded-full btn btn-primary mt-2 text-center" href="/contact">Promote Your Business</a>
 	  </div>
 	</details>
   )
