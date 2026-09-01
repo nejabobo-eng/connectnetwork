@@ -9,6 +9,7 @@ export default function NavLinksClient(){
 	{href:'/products',label:'What We Promote'},
 	{href:'/why',label:'Why ConnectNetwork'},
 	{href:'/promotion',label:'How We Promote'},
+	{href:'/suppliers',label:'Become a Supplier'},
 	{href:'/about',label:'About'},
 	{href:'/faq',label:'FAQ'},
   ]

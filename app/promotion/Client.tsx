@@ -1,8 +1,18 @@
 "use client"
+import { useState } from 'react'
 import { Globe2, Share2, MessageCircle, Megaphone, Radio, CheckCircle } from "lucide-react"
 import { motion } from "framer-motion"
 
 export default function PromotionClient(){
+  const [checkoutMessage, setCheckoutMessage] = useState('')
+  const [startingCheckout, setStartingCheckout] = useState(false)
+  async function startCheckout(event: React.FormEvent<HTMLFormElement>) {
+    event.preventDefault(); setStartingCheckout(true); setCheckoutMessage('')
+    const response = await fetch('/api/payments/promotion-checkout', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(Object.fromEntries(new FormData(event.currentTarget))) })
+    const data = await response.json().catch(() => ({})); setStartingCheckout(false)
+    if (response.ok && data.checkoutUrl) window.location.assign(data.checkoutUrl)
+    else setCheckoutMessage(data.error || 'Payment could not be started. Please try again.')
+  }
   const channels = [
     { icon: Globe2, title: "Website Promotion", desc: "Your business and products are featured on our website, reaching visitors actively looking for business solutions." },
     { icon: Share2, title: "Social Media", desc: "Promotional content is shared across our social media channels to reach a broader audience." },
@@ -101,6 +111,18 @@ return (
 <span>Order fulfillment and delivery</span>
   </li>
 </ul>
+  </section>
+
+  <section className="mt-12 card p-8 max-w-2xl">
+    <p className="text-secondary font-semibold">Start promotion</p>
+    <h2 className="text-2xl font-semibold mt-1">R100 per month</h2>
+    <p className="text-gray-600 mt-2">Securely continue to Yoco to start your monthly ConnectNetwork promotion.</p>
+    <form onSubmit={startCheckout} className="mt-5 grid sm:grid-cols-2 gap-4">
+      <input name="businessName" required className="border rounded-lg p-3" placeholder="Business name" aria-label="Business name" />
+      <input name="email" type="email" required className="border rounded-lg p-3" placeholder="Email address" aria-label="Email address" />
+      <button disabled={startingCheckout} className="btn btn-primary sm:col-span-2 justify-self-start">{startingCheckout ? 'Opening secure checkout…' : 'Continue to secure payment'}</button>
+    </form>
+    {checkoutMessage && <p role="alert" className="mt-3 text-sm text-red-600">{checkoutMessage}</p>}
   </section>
 </div>
   )

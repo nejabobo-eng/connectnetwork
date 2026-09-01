@@ -59,6 +59,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
 			  <ul className="space-y-2 text-gray-600">
 				<li><Link href="/">Home</Link></li>
 				<li><Link href="/products">What We Promote</Link></li>
+				<li><Link href="/suppliers">Become a Supplier</Link></li>
 				<li><Link href="/why">Why ConnectNetwork?</Link></li>
 				<li><Link href="/about">About</Link></li>
 				<li><Link href="/faq">FAQ</Link></li>
@@ -128,6 +129,7 @@ function MobileMenu({poppinsClass}:{poppinsClass:string}){
 	  <div className="absolute right-4 mt-2 w-60 card p-3">
 		<a className="block px-3 py-2 rounded-lg hover:bg-gray-50" href="/">Home</a>
 		<a className="block px-3 py-2 rounded-lg hover:bg-gray-50" href="/products">What We Promote</a>
+		<a className="block px-3 py-2 rounded-lg hover:bg-gray-50" href="/suppliers">Become a Supplier</a>
 		<a className="block px-3 py-2 rounded-lg hover:bg-gray-50" href="/why">Why ConnectNetwork</a>
 		<a className="block px-3 py-2 rounded-lg hover:bg-gray-50" href="/about">About</a>
 		<a className="block px-3 py-2 rounded-lg hover:bg-gray-50" href="/faq">FAQ</a>
