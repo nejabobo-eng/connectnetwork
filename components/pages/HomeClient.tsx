@@ -2,7 +2,7 @@
 
 import Image from 'next/image'
 import Link from 'next/link'
-import { ArrowRight, ChevronRight, PackageCheck, ShieldCheck, Store } from 'lucide-react'
+import { ArrowRight, PackageCheck, ShieldCheck, Store } from 'lucide-react'
 import { motion } from 'framer-motion'
 
 const products = [
@@ -11,8 +11,6 @@ const products = [
   { name: 'Everyday backpack', price: 'R459', category: 'Fashion', image: 'https://images.unsplash.com/photo-1553062407-98eeb64c6a62?auto=format&fit=crop&w=900&q=80' },
   { name: 'Kitchen storage set', price: 'R299', category: 'Home & living', image: 'https://images.unsplash.com/photo-1586208958839-06c17cacdf08?auto=format&fit=crop&w=900&q=80' }
 ]
-
-const categories = ['Electronics', 'Home & living', 'Beauty & care', 'Fashion', 'Business supplies', 'Special deals']
 
 export default function HomeClient() {
   return <main>
@@ -25,10 +23,8 @@ export default function HomeClient() {
           <div className="mt-8 flex flex-wrap gap-3"><Link href="/products" className="btn btn-primary">Shop products <ArrowRight className="ml-2 h-4 w-4" /></Link><Link href="/suppliers" className="btn btn-ghost">Sell on ConnectNetwork</Link></div>
           <div className="mt-8 flex flex-wrap gap-x-6 gap-y-3 text-sm font-medium text-slate-700"><span className="flex items-center gap-2"><ShieldCheck className="h-5 w-5 text-green" /> Approved suppliers</span><span className="flex items-center gap-2"><PackageCheck className="h-5 w-5 text-green" /> Secure checkout</span></div>
         </motion.div>
-        <motion.div className="rounded-3xl bg-navy p-6 text-white shadow-xl" initial={{ opacity: 0, scale: 0.97 }} animate={{ opacity: 1, scale: 1 }} transition={{ duration: 0.6 }}>
-          <p className="text-sm font-semibold text-blue-100">SHOP BY CATEGORY</p>
-          <div className="mt-5 grid grid-cols-2 gap-3">{categories.map(category => <Link key={category} href="/products" className="rounded-2xl bg-white/10 p-4 font-semibold transition hover:bg-white/20">{category}<ChevronRight className="mt-3 h-4 w-4 text-blue-200" /></Link>)}</div>
-          <div className="mt-5 rounded-2xl bg-green p-4"><p className="font-semibold">For suppliers</p><p className="mt-1 text-sm text-white/85">List your products, manage fulfilment and reach new customers.</p></div>
+        <motion.div className="flex items-center rounded-3xl bg-white p-6 shadow-xl md:p-8" initial={{ opacity: 0, scale: 0.97 }} animate={{ opacity: 1, scale: 1 }} transition={{ duration: 0.6 }}>
+          <Image src="/logo/logo.jpg" alt="ConnectNetwork — Products, Distribution, Opportunity" width={1536} height={1024} priority className="h-auto w-full" />
         </motion.div>
       </div>
     </section>
