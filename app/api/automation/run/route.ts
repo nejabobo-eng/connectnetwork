@@ -10,7 +10,7 @@ function allowed(request: Request) {
   return admin || Boolean(token && (token === process.env.AUTOMATION_WORKER_SECRET || token === process.env.CRON_SECRET))
 }
 
-export async function POST(request: Request) {
+async function run(request: Request) {
   if (!allowed(request)) return NextResponse.json({ error: 'Unauthorised' }, { status: 401 })
   try {
     const tasks = await adminRequest('ai_tasks?task_type=eq.discover_product_opportunity&status=eq.queued&order=created_at.asc&limit=1&select=*')
@@ -28,3 +28,6 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: 'Automation task failed' }, { status: 500 })
   }
 }
+
+export const GET = run
+export const POST = run
