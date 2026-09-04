@@ -1,5 +1,5 @@
 import FAQClient from './Client'
-export const metadata = { title: 'FAQ — ConnectNetwork Business Promotion Service', description: 'Frequently asked questions about ConnectNetwork promotion service. How it works, pricing, channels, and more.', alternates: { canonical: 'https://connectnetwork.co.za/faq' } } as const
+export const metadata = { title: 'Marketplace FAQ — ConnectNetwork', description: 'Answers to common questions about shopping and selling on ConnectNetwork.', alternates: { canonical: 'https://connectnetwork.co.za/faq' } } as const
 
 export default function FAQPage(){
   return (
@@ -8,9 +8,9 @@ export default function FAQPage(){
 	  <FAQClient />
 
 	  <section className="mt-12 bg-blue-50 border border-blue-200 rounded-lg p-8">
-		<h2 className="text-lg font-semibold text-blue-900 mb-3">About ConnectNetwork Promotion Service</h2>
+		<h2 className="text-lg font-semibold text-blue-900 mb-3">About the ConnectNetwork marketplace</h2>
 		<p className="text-sm text-blue-800 leading-relaxed">
-		  ConnectNetwork is a business promotion and marketing service. We help businesses get noticed by promoting their offerings through our network, audience and marketing capabilities. ConnectNetwork handles the promotion. Your business operates independently.
+		  ConnectNetwork connects shoppers with approved suppliers. Suppliers fulfil orders, and ConnectNetwork provides the marketplace experience.
 		</p>
 	  </section>
 

@@ -7,7 +7,7 @@ import { runOpportunityResearch } from '@/lib/openai'
 function allowed(request: Request) {
   const admin = isValidAdminSession(cookies().get(cookieName)?.value)
   const token = request.headers.get('authorization')?.replace('Bearer ', '')
-  return admin || Boolean(process.env.AUTOMATION_WORKER_SECRET && token === process.env.AUTOMATION_WORKER_SECRET)
+  return admin || Boolean(token && (token === process.env.AUTOMATION_WORKER_SECRET || token === process.env.CRON_SECRET))
 }
 
 export async function POST(request: Request) {

@@ -11,6 +11,8 @@
     "test": "echo \"No tests yet\" && exit 0"
   },
   "dependencies": {
+    "@supabase/ssr": "^0.12.5",
+    "@supabase/supabase-js": "^2.114.0",
     "clsx": "^2.1.1",
     "framer-motion": "^11.2.12",
     "lucide-react": "^0.441.0",

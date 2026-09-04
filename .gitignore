@@ -14,7 +14,9 @@ yarn-error.log*
 
 # Env
 .env
+.env.local
 .env.*.local
+*.tsbuildinfo
 
 # Build artifacts
 coverage/

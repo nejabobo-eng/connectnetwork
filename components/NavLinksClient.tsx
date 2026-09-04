@@ -4,14 +4,14 @@ import { usePathname } from 'next/navigation'
 
 export default function NavLinksClient(){
   const pathname = usePathname()
-  const links = [
+	const links = [
 	{href:'/',label:'Home'},
-	{href:'/products',label:'What We Promote'},
-	{href:'/why',label:'Why ConnectNetwork'},
-	{href:'/promotion',label:'How We Promote'},
-	{href:'/suppliers',label:'Become a Supplier'},
+	{href:'/products',label:'Shop'},
 	{href:'/about',label:'About'},
+	{href:'/suppliers',label:'Become a Supplier'},
 	{href:'/faq',label:'FAQ'},
+	{href:'/account',label:'Sign in'},
+	{href:'/cart',label:'Cart'},
   ]
   return (
 	<>
@@ -21,7 +21,7 @@ export default function NavLinksClient(){
 		  <Link key={l.href} href={l.href} className={`nav-link hover:text-primary ${active? 'text-primary font-semibold' : ''}`} aria-current={active? 'page' : undefined}>{l.label}</Link>
 		)
 	  })}
-	  <Link href="/contact" className="btn btn-primary text-white">Promote My Business</Link>
+	  <Link href="/products" className="btn btn-primary text-white">Shop Now</Link>
 	</>
   )
 }
