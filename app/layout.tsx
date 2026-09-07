@@ -5,6 +5,7 @@ import Link from 'next/link'
 import { Menu } from 'lucide-react'
 import { Suspense } from 'react'
 import NavLinksClient from '@/components/NavLinksClient'
+import { createSupabaseServerClient } from '@/lib/supabase-auth'
 
 const poppins = Poppins({ subsets: ['latin'], weight: ['600','700','800'] })
 const inter = Inter({ subsets: ['latin'] })
@@ -27,11 +28,18 @@ export const metadata: Metadata = {
   metadataBase: new URL('https://connectnetwork.co.za')
 }
 
-export default function RootLayout({ children }: { children: React.ReactNode }) {
+export default async function RootLayout({ children }: { children: React.ReactNode }) {
+  let signedIn = false
+  let firstName: string | undefined
+  try {
+    const { data: { user } } = await createSupabaseServerClient().auth.getUser()
+    signedIn = Boolean(user)
+    firstName = user?.user_metadata?.first_name || user?.user_metadata?.given_name || user?.user_metadata?.full_name?.split(' ')[0] || user?.user_metadata?.name?.split(' ')[0]
+  } catch {}
   return (
 	<html lang="en">
 		<body className={`${inter.className}`}>
-		<Header poppinsClass={poppins.className} />
+		<Header poppinsClass={poppins.className} signedIn={signedIn} firstName={firstName} />
 		{/* JSON-LD Organization schema */}
 		<script type="application/ld+json" dangerouslySetInnerHTML={{__html: JSON.stringify({
 		  '@context': 'https://schema.org',
@@ -89,7 +97,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
   )
 }
 
-function Header({poppinsClass}:{poppinsClass:string}){
+function Header({ poppinsClass, signedIn, firstName }: { poppinsClass: string, signedIn: boolean, firstName?: string }){
   return (
 	<header className="fixed inset-x-0 top-0 z-50 transition bg-transparent data-[scrolled=true]:glass border-b border-transparent data-[scrolled=true]:border-gray-200">
 		<div className="container-section flex h-20 items-center justify-between">
@@ -98,9 +106,9 @@ function Header({poppinsClass}:{poppinsClass:string}){
 		  <span className="sr-only">ConnectNetwork</span>
 		</Link>
 		<nav className="hidden md:flex gap-6 text-sm" aria-label="Main Navigation">
-		  <NavLinksClient />
+		  <NavLinksClient signedIn={signedIn} firstName={firstName} />
 		</nav>
-		<MobileMenu poppinsClass={poppinsClass} />
+		<MobileMenu poppinsClass={poppinsClass} signedIn={signedIn} firstName={firstName} />
 	  </div>
 	  <script dangerouslySetInnerHTML={{__html:`
 		const header=document.querySelector('header');
@@ -120,7 +128,7 @@ function Header({poppinsClass}:{poppinsClass:string}){
 
 // server-only NavLink removed in favor of client component with usePathname
 
-function MobileMenu({poppinsClass}:{poppinsClass:string}){
+function MobileMenu({ poppinsClass, signedIn, firstName }: { poppinsClass: string, signedIn: boolean, firstName?: string }){
   return (
 	<details className="md:hidden">
 	  <summary className="list-none p-2 rounded-lg hover:bg-gray-100 cursor-pointer" aria-label="Open menu">
@@ -133,7 +141,7 @@ function MobileMenu({poppinsClass}:{poppinsClass:string}){
 		<a className="block px-3 py-2 rounded-lg hover:bg-gray-50" href="/why">Why ConnectNetwork</a>
 		<a className="block px-3 py-2 rounded-lg hover:bg-gray-50" href="/about">About</a>
 		<a className="block px-3 py-2 rounded-lg hover:bg-gray-50" href="/faq">FAQ</a>
-		<a className="block px-3 py-2 rounded-lg hover:bg-gray-50" href="/account">Account</a>
+		<a className="block px-3 py-2 rounded-lg hover:bg-gray-50" href="/account">{signedIn ? (firstName ? `Hi, ${firstName}` : 'Account') : 'Sign in'}</a>
 		<a className="block px-3 py-2 rounded-lg hover:bg-gray-50" href="/cart">Cart</a>
 		<a className="block px-3 py-2 rounded-full btn btn-primary mt-2 text-center" href="/products">Shop Now</a>
 	  </div>

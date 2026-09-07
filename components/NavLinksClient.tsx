@@ -2,7 +2,7 @@
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 
-export default function NavLinksClient(){
+export default function NavLinksClient({ signedIn = false, firstName }: { signedIn?: boolean, firstName?: string }){
   const pathname = usePathname()
 	const links = [
 	{href:'/',label:'Home'},
@@ -10,7 +10,7 @@ export default function NavLinksClient(){
 	{href:'/about',label:'About'},
 	{href:'/suppliers',label:'Become a Supplier'},
 	{href:'/faq',label:'FAQ'},
-	{href:'/account',label:'Account'},
+	{href:'/account',label:signedIn ? (firstName ? `Hi, ${firstName}` : 'Account') : 'Sign in'},
 	{href:'/cart',label:'Cart'},
   ]
   return (
