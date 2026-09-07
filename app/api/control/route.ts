@@ -39,6 +39,17 @@ export async function POST(request: Request) {
       await approveOpportunity(body.opportunityId)
       return NextResponse.json({ ok: true })
     }
+    if (body.action === 'run-automation') {
+      const secret = process.env.AUTOMATION_WORKER_SECRET || process.env.CRON_SECRET
+      if (!secret) throw new Error('Automation worker is not configured')
+      const response = await fetch(new URL('/api/automation/run', request.url), {
+        headers: { Authorization: `Bearer ${secret}` },
+        cache: 'no-store',
+      })
+      const result = await response.json().catch(() => ({}))
+      if (!response.ok) throw new Error(typeof result.error === 'string' ? result.error : 'Automation worker could not be started')
+      return NextResponse.json(result)
+    }
     return NextResponse.json({ error: 'Invalid control action' }, { status: 400 })
   } catch (error) { return NextResponse.json({ error: error instanceof Error ? error.message : 'Control action failed' }, { status:500 }) }
 }
