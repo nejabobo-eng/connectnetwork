@@ -64,7 +64,7 @@ export default function CartClient({ email }: { email?: string | null }) {
       return
     }
 
-    setMessage('Confirming your payment…')
+    setMessage('Confirming your payment securely…')
     let attempts = 0
     const confirmPayment = async () => {
       attempts += 1
@@ -81,8 +81,10 @@ export default function CartClient({ email }: { email?: string | null }) {
         }
       } catch {}
 
-      if (!cancelled && attempts < 12) window.setTimeout(confirmPayment, 2500)
-      else if (!cancelled) setMessage('Your payment is still being confirmed. Your cart will stay safe until it is verified.')
+      if (!cancelled && attempts < 12) {
+        if (attempts === 3) setMessage('Your payment is taking a little longer to confirm. Please do not pay again.')
+        window.setTimeout(confirmPayment, 2500)
+      } else if (!cancelled) setMessage('We could not confirm your payment yet. Your cart is still safe and has not been charged again.')
     }
 
     void confirmPayment()

@@ -5,17 +5,19 @@ type PaymentRecord = {
   id: string
   order_id: string
   provider_payment_id: string | null
+  state: string | null
 }
 
 function isPaidStatus(status: unknown) {
-  return ['succeeded', 'successful', 'paid'].includes(String(status).toLowerCase())
+  return ['succeeded', 'successful', 'paid', 'completed', 'complete'].includes(String(status).toLowerCase())
 }
 
 export async function verifyMarketplacePayment(paymentId: string) {
-  const payments = await adminRequest(`payment_transactions?id=eq.${encodeURIComponent(paymentId)}&select=id,order_id,provider_payment_id`)
+  const payments = await adminRequest(`payment_transactions?id=eq.${encodeURIComponent(paymentId)}&select=id,order_id,provider_payment_id,state`)
   const payment = payments[0] as PaymentRecord | undefined
 
   if (!payment?.provider_payment_id) throw new Error('Payment not found')
+  if (payment.state === 'succeeded') return { paid: true, status: payment.state }
 
   const checkout = await getYocoCheckout(payment.provider_payment_id)
   if (!isPaidStatus(checkout.status)) return { paid: false, status: checkout.status }
