@@ -133,7 +133,7 @@ function MobileMenu({poppinsClass}:{poppinsClass:string}){
 		<a className="block px-3 py-2 rounded-lg hover:bg-gray-50" href="/why">Why ConnectNetwork</a>
 		<a className="block px-3 py-2 rounded-lg hover:bg-gray-50" href="/about">About</a>
 		<a className="block px-3 py-2 rounded-lg hover:bg-gray-50" href="/faq">FAQ</a>
-		<a className="block px-3 py-2 rounded-lg hover:bg-gray-50" href="/account">Sign in</a>
+		<a className="block px-3 py-2 rounded-lg hover:bg-gray-50" href="/account">Account</a>
 		<a className="block px-3 py-2 rounded-lg hover:bg-gray-50" href="/cart">Cart</a>
 		<a className="block px-3 py-2 rounded-full btn btn-primary mt-2 text-center" href="/products">Shop Now</a>
 	  </div>

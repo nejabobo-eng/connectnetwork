@@ -1,21 +1,24 @@
 import { NextResponse } from 'next/server'
 import { adminRequest, insertAdminRecord } from '@/lib/supabase-admin'
+import { createSupabaseServerClient } from '@/lib/supabase-auth'
 import { createYocoCheckout } from '@/lib/yoco'
 
 type CartItem = { productId: string; quantity: number }
 type Product = { id: string; supplier_id: string; name: string; retail_price_cents: number; stock_quantity: number | null }
 
 export async function POST(request: Request) {
-  const body: { email?: unknown; items?: unknown } = await request.json().catch(() => ({}))
-  const email = typeof body.email === 'string' ? body.email.trim().toLowerCase() : ''
+  const body: { items?: unknown } = await request.json().catch(() => ({}))
   const rawItems: unknown[] = Array.isArray(body.items) ? body.items : []
   const items = rawItems.filter((item): item is CartItem => {
     if (!item || typeof item !== 'object') return false
     const candidate = item as { productId?: unknown; quantity?: unknown }
     return typeof candidate.productId === 'string' && Number.isInteger(candidate.quantity) && Number(candidate.quantity) > 0 && Number(candidate.quantity) <= 10
   })
-  if (!email || items.length === 0) return NextResponse.json({ error: 'An email address and at least one cart item are required.' }, { status: 400 })
+  if (items.length === 0) return NextResponse.json({ error: 'Add at least one cart item before checking out.' }, { status: 400 })
   try {
+    const { data: { user } } = await createSupabaseServerClient().auth.getUser()
+    const email = user?.email?.trim().toLowerCase()
+    if (!email) return NextResponse.json({ error: 'Please sign in before checking out.' }, { status: 401 })
     const ids = items.map(item => item.productId).join(',')
     const products = await adminRequest(`products?id=in.(${ids})&active=eq.true&select=id,supplier_id,name,retail_price_cents,stock_quantity`) as Product[]
     if (products.length !== items.length) throw new Error('One or more products are no longer available')

@@ -1,6 +1,7 @@
 'use client'
 
 import { useEffect, useMemo, useState } from 'react'
+import Link from 'next/link'
 
 type Item = { productId: string; name: string; price: number; quantity: number }
 
@@ -16,9 +17,8 @@ export function addToCart(item: Omit<Item, 'quantity'>) {
   window.dispatchEvent(new Event('cart-updated'))
 }
 
-export default function CartClient() {
+export default function CartClient({ email }: { email?: string | null }) {
   const [items, setItems] = useState<Item[]>([])
-  const [email, setEmail] = useState('')
   const [message, setMessage] = useState('')
   const [checkingOut, setCheckingOut] = useState(false)
   const total = useMemo(() => items.reduce((sum, item) => sum + item.price * item.quantity, 0), [items])
@@ -98,9 +98,8 @@ export default function CartClient() {
   }
 
   async function checkout() {
-    const trimmedEmail = email.trim()
-    if (!trimmedEmail) {
-      setMessage('Enter your email address to receive order updates before checking out.')
+    if (!email) {
+      setMessage('Please sign in or create an account before checking out.')
       return
     }
     if (!items.length) return
@@ -111,7 +110,7 @@ export default function CartClient() {
       const response = await fetch('/api/payments/marketplace-checkout', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email: trimmedEmail, items: items.map(item => ({ productId: item.productId, quantity: item.quantity })) }),
+        body: JSON.stringify({ items: items.map(item => ({ productId: item.productId, quantity: item.quantity })) }),
       })
       const data = await response.json().catch(() => ({}))
       if (response.ok && typeof data.checkoutUrl === 'string') {
@@ -139,8 +138,7 @@ export default function CartClient() {
       <aside className="card h-fit p-6">
         <h2 className="text-xl font-bold">Order summary</h2>
         <p className="mt-4 text-2xl font-bold">R{(total / 100).toFixed(2)}</p>
-        <input value={email} onChange={event => setEmail(event.target.value)} className="mt-5 w-full rounded-lg border p-3" type="email" placeholder="Email for order updates" />
-        <button onClick={checkout} disabled={checkingOut} className="btn btn-primary mt-4 w-full">{checkingOut ? 'Opening checkout…' : 'Secure checkout'}</button>
+        {email ? <><p className="mt-5 text-sm text-slate-600">Order updates: <strong>{email}</strong></p><button onClick={checkout} disabled={checkingOut} className="btn btn-primary mt-4 w-full">{checkingOut ? 'Opening checkout…' : 'Secure checkout'}</button></> : <><p className="mt-5 text-sm text-slate-600">Sign in to complete your purchase and receive order updates.</p><Link href="/account" className="btn btn-primary mt-4 w-full">Sign in to checkout</Link></>}
       </aside>
     </div>}
   </main>

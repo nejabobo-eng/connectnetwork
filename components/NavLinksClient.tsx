@@ -10,7 +10,7 @@ export default function NavLinksClient(){
 	{href:'/about',label:'About'},
 	{href:'/suppliers',label:'Become a Supplier'},
 	{href:'/faq',label:'FAQ'},
-	{href:'/account',label:'Sign in'},
+	{href:'/account',label:'Account'},
 	{href:'/cart',label:'Cart'},
   ]
   return (
