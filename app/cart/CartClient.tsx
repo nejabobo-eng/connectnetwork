@@ -5,6 +5,7 @@ import { useEffect, useMemo, useState } from 'react'
 type Item = { productId: string; name: string; price: number; quantity: number }
 
 const cartKey = 'connectnetwork_cart'
+const pendingPaymentKey = 'connectnetwork_pending_payment'
 
 export function addToCart(item: Omit<Item, 'quantity'>) {
   const current: Item[] = JSON.parse(localStorage.getItem(cartKey) || '[]')
@@ -28,6 +29,7 @@ export default function CartClient() {
 
   function clearCart() {
     localStorage.removeItem(cartKey)
+    localStorage.removeItem(pendingPaymentKey)
     setItems([])
     window.dispatchEvent(new Event('cart-updated'))
   }
@@ -45,7 +47,7 @@ export default function CartClient() {
   useEffect(() => {
     const parameters = new URLSearchParams(window.location.search)
     const payment = parameters.get('payment')
-    const paymentId = parameters.get('paymentId')
+    const paymentId = parameters.get('paymentId') || localStorage.getItem(pendingPaymentKey)
     let cancelled = false
 
     if (payment === 'success') {
@@ -55,7 +57,7 @@ export default function CartClient() {
       return
     }
 
-    if (payment !== 'pending' || !paymentId) {
+    if (!paymentId) {
       if (payment === 'pending') setMessage('Your payment is being confirmed. Please refresh this page in a moment.')
       if (payment === 'cancelled') setMessage('Payment was cancelled. Your cart has been kept.')
       if (payment === 'verification_failed') setMessage('We could not verify the payment yet. Your cart has been kept safely.')
@@ -112,7 +114,10 @@ export default function CartClient() {
         body: JSON.stringify({ email: trimmedEmail, items: items.map(item => ({ productId: item.productId, quantity: item.quantity })) }),
       })
       const data = await response.json().catch(() => ({}))
-      if (response.ok) window.location.assign(data.checkoutUrl)
+      if (response.ok && typeof data.checkoutUrl === 'string') {
+        if (typeof data.paymentId === 'string') localStorage.setItem(pendingPaymentKey, data.paymentId)
+        window.location.assign(data.checkoutUrl)
+      }
       else setMessage(data.error || 'Checkout could not be started.')
     } catch {
       setMessage('Checkout could not be started. Please try again.')

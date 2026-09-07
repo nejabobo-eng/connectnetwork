@@ -28,6 +28,6 @@ export async function POST(request: Request) {
     const origin = new URL(request.url).origin
     const checkout = await createYocoCheckout({ amount: total, successUrl: `${origin}/api/payments/yoco/order-return?paymentId=${payment.id}`, cancelUrl: `${origin}/cart?payment=cancelled`, metadata: { paymentId: String(payment.id), orderId: String(order.id) } })
     await adminRequest(`payment_transactions?id=eq.${payment.id}`, { method: 'PATCH', headers: { Prefer: 'return=minimal' }, body: JSON.stringify({ provider_payment_id: checkout.id }) })
-    return NextResponse.json({ checkoutUrl: checkout.redirectUrl })
+    return NextResponse.json({ checkoutUrl: checkout.redirectUrl, paymentId: payment.id })
   } catch (error) { return NextResponse.json({ error: error instanceof Error ? error.message : 'Checkout could not be started.' }, { status: 500 }) }
 }
