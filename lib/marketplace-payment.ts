@@ -9,7 +9,7 @@ type PaymentRecord = {
   state: string | null
 }
 
-type OrderRecord = { id: string; customer_email: string | null; total_cents: number }
+type OrderRecord = { id: string; order_number: string | null; customer_email: string | null; total_cents: number }
 type OrderItemRecord = { supplier_id: string; product_id: string; product_name: string }
 
 function isPaidStatus(status: unknown) {
@@ -17,7 +17,7 @@ function isPaidStatus(status: unknown) {
 }
 
 async function preparePaidOrder(orderId: string) {
-  const [order] = await adminRequest(`orders?id=eq.${encodeURIComponent(orderId)}&select=id,customer_email,total_cents`) as OrderRecord[]
+  const [order] = await adminRequest(`orders?id=eq.${encodeURIComponent(orderId)}&select=id,order_number,customer_email,total_cents`) as OrderRecord[]
   if (!order?.customer_email) return
   const items = await adminRequest(`order_items?order_id=eq.${encodeURIComponent(orderId)}&select=supplier_id,product_id,product_name`) as OrderItemRecord[]
   const supplierProducts = new Map<string, OrderItemRecord>()
@@ -25,7 +25,7 @@ async function preparePaidOrder(orderId: string) {
 
   await Promise.allSettled([
     ...Array.from(supplierProducts.values()).map(item => adminRequest(`supplier_deliveries?order_id=eq.${encodeURIComponent(orderId)}&supplier_id=eq.${encodeURIComponent(item.supplier_id)}&select=id`).then(async deliveries => {
-      if (!Array.isArray(deliveries) || deliveries.length === 0) await adminRequest('supplier_deliveries', { method: 'POST', headers: { Prefer: 'return=minimal' }, body: JSON.stringify({ order_id: orderId, supplier_id: item.supplier_id, product_id: item.product_id, status: 'awaiting_dispatch' }) })
+      if (!Array.isArray(deliveries) || deliveries.length === 0) await adminRequest('supplier_deliveries', { method: 'POST', headers: { Prefer: 'return=minimal' }, body: JSON.stringify({ order_id: orderId, supplier_id: item.supplier_id, product_id: item.product_id, internal_reference: `CN-SUP-${(order.order_number || orderId).replace(/^CN-ORD-/, '')}-${item.supplier_id.slice(0, 4).toUpperCase()}`, status: 'awaiting_dispatch' }) })
     })),
     adminRequest('ai_tasks', { method: 'POST', headers: { Prefer: 'return=minimal' }, body: JSON.stringify({ task_type: 'monitor_paid_order', payload: { order_id: orderId } }) }),
     sendOrderConfirmation({ orderId, email: order.customer_email, totalCents: order.total_cents, itemNames: items.map(item => item.product_name) }),

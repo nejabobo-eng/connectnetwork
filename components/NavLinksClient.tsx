@@ -21,6 +21,7 @@ export default function NavLinksClient({ signedIn = false, firstName }: { signed
 		  <Link key={l.href} href={l.href} className={`nav-link hover:text-primary ${active? 'text-primary font-semibold' : ''}`} aria-current={active? 'page' : undefined}>{l.label}</Link>
 		)
 	  })}
+	  {signedIn && <form action="/api/auth/customer/logout" method="post"><button type="submit" className="nav-link hover:text-primary">Sign out</button></form>}
 	  <Link href="/products" className="btn btn-primary text-white">Shop Now</Link>
 	</>
   )

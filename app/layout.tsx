@@ -142,6 +142,7 @@ function MobileMenu({ poppinsClass, signedIn, firstName }: { poppinsClass: strin
 		<a className="block px-3 py-2 rounded-lg hover:bg-gray-50" href="/about">About</a>
 		<a className="block px-3 py-2 rounded-lg hover:bg-gray-50" href="/faq">FAQ</a>
 		<a className="block px-3 py-2 rounded-lg hover:bg-gray-50" href="/account">{signedIn ? (firstName ? `Hi, ${firstName}` : 'Account') : 'Sign in'}</a>
+		{signedIn && <form action="/api/auth/customer/logout" method="post"><button className="block w-full px-3 py-2 text-left rounded-lg hover:bg-gray-50">Sign out</button></form>}
 		<a className="block px-3 py-2 rounded-lg hover:bg-gray-50" href="/cart">Cart</a>
 		<a className="block px-3 py-2 rounded-full btn btn-primary mt-2 text-center" href="/products">Shop Now</a>
 	  </div>

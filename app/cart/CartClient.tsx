@@ -2,6 +2,7 @@
 
 import { useEffect, useMemo, useState } from 'react'
 import Link from 'next/link'
+import { deliveryFeeFromHighestPricedItem } from '@/lib/delivery-pricing'
 
 type Item = { productId: string; name: string; price: number; quantity: number }
 
@@ -21,7 +22,11 @@ export default function CartClient({ email }: { email?: string | null }) {
   const [items, setItems] = useState<Item[]>([])
   const [message, setMessage] = useState('')
   const [checkingOut, setCheckingOut] = useState(false)
-  const total = useMemo(() => items.reduce((sum, item) => sum + item.price * item.quantity, 0), [items])
+  const [deliveryAddress, setDeliveryAddress] = useState({ line1: '', suburb: '', city: '', postalCode: '', mapUrl: '' })
+  const [deliveryPhone, setDeliveryPhone] = useState('')
+  const deliveryFee = useMemo(() => deliveryFeeFromHighestPricedItem(items.map(item => item.price)), [items])
+  const subtotal = useMemo(() => items.reduce((sum, item) => sum + item.price * item.quantity, 0), [items])
+  const total = subtotal + (deliveryFee || 0)
 
   function loadCart() {
     setItems(JSON.parse(localStorage.getItem(cartKey) || '[]'))
@@ -57,9 +62,15 @@ export default function CartClient({ email }: { email?: string | null }) {
       return
     }
 
+    if (payment === 'cancelled') {
+      localStorage.removeItem(pendingPaymentKey)
+      setMessage('Payment was cancelled. Your cart has been kept.')
+      removePaymentQuery()
+      return
+    }
+
     if (!paymentId) {
       if (payment === 'pending') setMessage('Your payment is being confirmed. Please refresh this page in a moment.')
-      if (payment === 'cancelled') setMessage('Payment was cancelled. Your cart has been kept.')
       if (payment === 'verification_failed') setMessage('We could not verify the payment yet. Your cart has been kept safely.')
       return
     }
@@ -112,7 +123,7 @@ export default function CartClient({ email }: { email?: string | null }) {
       const response = await fetch('/api/payments/marketplace-checkout', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ items: items.map(item => ({ productId: item.productId, quantity: item.quantity })) }),
+        body: JSON.stringify({ items: items.map(item => ({ productId: item.productId, quantity: item.quantity })), deliveryAddress, deliveryPhone }),
       })
       const data = await response.json().catch(() => ({}))
       if (response.ok && typeof data.checkoutUrl === 'string') {
@@ -139,8 +150,8 @@ export default function CartClient({ email }: { email?: string | null }) {
       </section>
       <aside className="card h-fit p-6">
         <h2 className="text-xl font-bold">Order summary</h2>
-        <p className="mt-4 text-2xl font-bold">R{(total / 100).toFixed(2)}</p>
-        {email ? <><p className="mt-5 text-sm text-slate-600">Order updates: <strong>{email}</strong></p><button onClick={checkout} disabled={checkingOut} className="btn btn-primary mt-4 w-full">{checkingOut ? 'Opening checkout…' : 'Secure checkout'}</button></> : <><p className="mt-5 text-sm text-slate-600">Sign in to complete your purchase and receive order updates.</p><Link href="/account" className="btn btn-primary mt-4 w-full">Sign in to checkout</Link></>}
+        <div className="mt-4 space-y-2 text-sm text-slate-700"><div className="flex justify-between"><span>Products</span><strong>R{(subtotal / 100).toFixed(2)}</strong></div><div className="flex justify-between"><span>Delivery</span><strong>R{(deliveryFee / 100).toFixed(2)}</strong></div></div><div className="mt-4 flex justify-between border-t pt-4 text-2xl font-bold"><span>Total</span><span>R{(total / 100).toFixed(2)}</span></div>
+        {email ? <><p className="mt-5 text-sm text-slate-600">Order updates: <strong>{email}</strong></p><div className="mt-4 grid gap-3"><input required value={deliveryAddress.line1} onChange={event => setDeliveryAddress(address => ({ ...address, line1: event.target.value }))} className="rounded-lg border p-3 text-sm" placeholder="Street address and unit number" /><input required value={deliveryAddress.suburb} onChange={event => setDeliveryAddress(address => ({ ...address, suburb: event.target.value }))} className="rounded-lg border p-3 text-sm" placeholder="Suburb" /><div className="grid grid-cols-2 gap-3"><input required value={deliveryAddress.city} onChange={event => setDeliveryAddress(address => ({ ...address, city: event.target.value }))} className="rounded-lg border p-3 text-sm" placeholder="City" /><input required value={deliveryAddress.postalCode} onChange={event => setDeliveryAddress(address => ({ ...address, postalCode: event.target.value }))} className="rounded-lg border p-3 text-sm" placeholder="Postal code" /></div><input required value={deliveryPhone} onChange={event => setDeliveryPhone(event.target.value)} className="rounded-lg border p-3 text-sm" placeholder="Delivery phone number" /><input type="url" value={deliveryAddress.mapUrl} onChange={event => setDeliveryAddress(address => ({ ...address, mapUrl: event.target.value }))} className="rounded-lg border p-3 text-sm" placeholder="Google Maps location link (optional)" /></div><p className="mt-3 text-xs text-slate-500">Delivery is included in your total before payment.</p><button onClick={checkout} disabled={checkingOut} className="btn btn-primary mt-4 w-full">{checkingOut ? 'Opening checkout…' : `Secure checkout · R${(total / 100).toFixed(2)}`}</button></> : <><p className="mt-5 text-sm text-slate-600">Sign in to complete your purchase and receive order updates.</p><Link href="/account" className="btn btn-primary mt-4 w-full">Sign in to checkout</Link></>}
       </aside>
     </div>}
   </main>
