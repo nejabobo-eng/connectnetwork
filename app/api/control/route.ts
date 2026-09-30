@@ -38,7 +38,7 @@ async function approveOpportunity(opportunityId: string) {
   if (!opportunity.proposed_supplier_id || !opportunity.proposed_product?.name) throw new Error('This opportunity does not contain a supplier and product to publish.')
   const { retailPriceCents, supplierCostCents, imageUrl } = confirmedListingDetails(opportunity.proposed_product)
   if (opportunity.proposed_supplier_id) await adminRequest(`suppliers?id=eq.${opportunity.proposed_supplier_id}`, { method: 'PATCH', headers: { Prefer: 'return=minimal' }, body: JSON.stringify({ status: 'approved', reviewed_at: new Date().toISOString() }) })
-  await insertAdminRecord('products', { supplier_id: opportunity.proposed_supplier_id, name: opportunity.proposed_product.name, description: opportunity.proposed_product.description || null, category: typeof opportunity.proposed_product.category === 'string' ? opportunity.proposed_product.category : 'Other', supplier_cost_cents: supplierCostCents, retail_price_cents: retailPriceCents, stock_quantity: opportunity.proposed_product.stock_quantity || null, image_url: imageUrl, active: true })
+  await insertAdminRecord('products', { supplier_id: opportunity.proposed_supplier_id, name: opportunity.proposed_product.name, description: opportunity.proposed_product.description || null, category: typeof opportunity.proposed_product.category === 'string' ? opportunity.proposed_product.category : 'Other', supplier_cost_cents: supplierCostCents, retail_price_cents: retailPriceCents, stock_quantity: opportunity.proposed_product.stock_quantity || null, image_url: imageUrl, supplier_source_url: opportunity.source_url || null, source_price_cents: Number(opportunity.proposed_product.source_price_cents) || supplierCostCents, source_currency: typeof opportunity.proposed_product.source_currency === 'string' ? opportunity.proposed_product.source_currency : 'ZAR', source_checked_at: typeof opportunity.proposed_product.source_checked_at === 'string' ? opportunity.proposed_product.source_checked_at : new Date().toISOString(), source_image_urls: Array.isArray(opportunity.proposed_product.source_image_urls) ? opportunity.proposed_product.source_image_urls : [imageUrl], active: true })
   await adminRequest(`supplier_opportunities?id=eq.${encodeURIComponent(opportunityId)}`, { method: 'PATCH', headers: { Prefer: 'return=minimal' }, body: JSON.stringify({ status: 'approved', reviewed_at: new Date().toISOString() }) })
   await insertAdminRecord('ai_events', { event_type: 'opportunity_approved_for_publish', actor: 'admin', payload: { opportunity_id: opportunityId, supplier_id: opportunity.proposed_supplier_id } })
 }
@@ -233,6 +233,15 @@ export async function POST(request: Request) {
   if (!hasControlApiAccess(request)) return NextResponse.json({ error: 'Unauthorised' }, { status: 401 })
   const body = await request.json().catch(() => ({}))
   try {
+    if (body.action === 'queue-crawl-supplier' && typeof body.sourceUrl === 'string') {
+      const sourceUrl = body.sourceUrl.trim()
+      let url: URL
+      try { url = new URL(sourceUrl) } catch { throw new Error('Enter a valid supplier product URL.') }
+      if (url.protocol !== 'https:' && url.protocol !== 'http:') throw new Error('Enter a valid supplier product URL.')
+      const [task] = await insertAdminRecord('ai_tasks', { task_type: 'crawl_supplier_url', payload: { source_url: sourceUrl } })
+      await insertAdminRecord('ai_events', { task_id: task.id, event_type: 'supplier_crawl_queued', actor: 'admin', payload: { source_url: sourceUrl } })
+      return NextResponse.json({ id: task.id }, { status: 201 })
+    }
     if (body.action === 'queue-discovery' && typeof body.demandSignal === 'string' && body.demandSignal.trim().length >= 10) {
       const demandSignal = body.demandSignal.trim().slice(0, 2000)
       const [task] = await insertAdminRecord('ai_tasks', { task_type: 'discover_product_opportunity', payload: { demand_signal: demandSignal } })

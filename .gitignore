@@ -35,3 +35,8 @@ Thumbs.db
 
 # Local tooling
 .tmp/
+
+# Crawl4AI local worker environment
+crawler/.venv/
+crawler/__pycache__/
+crawler/*.log

@@ -3,13 +3,14 @@ import { cookies } from 'next/headers'
 import { cookieName, isValidAdminSession } from '@/lib/admin-auth'
 import { adminRequest, insertAdminRecord } from '@/lib/supabase-admin'
 import { runOpportunityResearch } from '@/lib/openai'
+import { categorizeCrawledProduct, crawlSupplierProduct } from '@/lib/crawl4ai'
 import { defaultMarkupPercent, extractSupplierListingDetails, sellingPriceFromCost } from '@/lib/supplier-listing'
 
 type AutomationTask = {
   id: string
   task_type: string
   attempts?: number
-  payload?: { order_id?: string; demand_signal?: string }
+  payload?: { order_id?: string; demand_signal?: string; source_url?: string }
 }
 
 const maximumAutomaticAttempts = 3
@@ -43,7 +44,7 @@ async function run(request: Request) {
     task = tasks[0] as AutomationTask | undefined
     if (!task) return NextResponse.json({ processed: false, message: 'No queued tasks' })
     attemptNumber = Number(task.attempts || 0) + 1
-    await adminRequest(`ai_tasks?id=eq.${task.id}&status=eq.queued`, { method: 'PATCH', headers: { Prefer: 'return=minimal' }, body: JSON.stringify({ status: 'running', attempts: attemptNumber, locked_at: new Date().toISOString(), locked_by: 'openai-operator' }) })
+    await adminRequest(`ai_tasks?id=eq.${task.id}&status=eq.queued`, { method: 'PATCH', headers: { Prefer: 'return=minimal' }, body: JSON.stringify({ status: 'running', attempts: attemptNumber, locked_at: new Date().toISOString(), locked_by: task.task_type === 'crawl_supplier_url' ? 'crawl4ai-operator' : 'openai-operator' }) })
     if (task.task_type === 'monitor_paid_order') {
       const orderId = String(task.payload?.order_id || '')
       const deliveries = orderId ? await adminRequest(`supplier_deliveries?order_id=eq.${encodeURIComponent(orderId)}&select=status,created_at`) : []
@@ -51,6 +52,21 @@ async function run(request: Request) {
       await adminRequest(`ai_tasks?id=eq.${task.id}`, { method: 'PATCH', headers: { Prefer: 'return=minimal' }, body: JSON.stringify({ status: 'completed', completed_at: new Date().toISOString() }) })
       await insertAdminRecord('ai_events', { task_id: task.id, event_type: awaitingDispatch ? 'paid_order_requires_dispatch' : 'paid_order_delivery_checked', actor: 'operations_monitor', payload: { order_id: orderId, delivery_count: Array.isArray(deliveries) ? deliveries.length : 0, requires_human_action: awaitingDispatch } })
       return NextResponse.json({ processed: true, orderId, requiresHumanAction: awaitingDispatch })
+    }
+    if (task.task_type === 'crawl_supplier_url') {
+      const sourceUrl = String(task.payload?.source_url || '')
+      const existing = sourceUrl ? await adminRequest(`supplier_opportunities?source_url=eq.${encodeURIComponent(sourceUrl)}&status=in.(researching,ready_for_review,approved)&select=id&limit=1`) : []
+      if (existing.length) throw new Error('This supplier product URL is already in the approval pipeline.')
+      const result = await crawlSupplierProduct(sourceUrl)
+      const category = categorizeCrawledProduct(result.productName, result.productDescription)
+      const markupPercent = defaultMarkupPercent()
+      const retailPriceCents = sellingPriceFromCost(result.sourcePriceCents, markupPercent)
+      const supplier = (await insertAdminRecord('suppliers', { channel: 'crawler_discovered', status: 'pending_review', business_name: result.supplierName || 'Unverified supplier', website_url: result.supplierWebsite || null, source_url: result.sourceUrl }))[0]
+      const opportunity = (await insertAdminRecord('supplier_opportunities', { status: 'ready_for_review', title: result.productName, source_url: result.sourceUrl, demand_summary: `Supplier page crawled on ${result.checkedAt}. ${result.availability ? `Availability: ${result.availability}.` : ''}`.trim(), estimated_margin: markupPercent, confidence: 1, proposed_supplier_id: supplier.id, proposed_product: { name: result.productName, description: result.productDescription || '', category, supplier_cost_cents: result.sourcePriceCents, markup_percent: markupPercent, retail_price_cents: retailPriceCents, image_url: result.imageUrls[0], source_image_urls: result.imageUrls, source_price_cents: result.sourcePriceCents, source_currency: result.currency, source_checked_at: result.checkedAt, availability: result.availability || null } }))[0]
+      await insertAdminRecord('supplier_source_checks', { source_url: result.sourceUrl, supplier_id: supplier.id, source_price_cents: result.sourcePriceCents, source_currency: result.currency, source_image_urls: result.imageUrls, availability: result.availability || null, checked_at: result.checkedAt, raw_data: result })
+      await adminRequest(`ai_tasks?id=eq.${task.id}`, { method: 'PATCH', headers: { Prefer: 'return=minimal' }, body: JSON.stringify({ status: 'completed', completed_at: new Date().toISOString() }) })
+      await insertAdminRecord('ai_events', { task_id: task.id, event_type: 'supplier_url_crawled', actor: 'crawl4ai_operator', payload: { opportunity_id: opportunity.id, supplier_id: supplier.id, source_url: result.sourceUrl } })
+      return NextResponse.json({ processed: true, opportunityId: opportunity.id, provider: 'crawl4ai' })
     }
     if (task.task_type !== 'discover_product_opportunity') throw new Error(`Unsupported automation task: ${task.task_type}`)
     const result = await runOpportunityResearch(String(task.payload?.demand_signal || 'Find a viable South African product opportunity.'))
