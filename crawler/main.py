@@ -104,3 +104,29 @@ async def extract(request: ExtractRequest):
         'availability': availability,
         'checkedAt': datetime.now(timezone.utc).isoformat(),
     }
+
+@app.post('/discover')
+async def discover(request: ExtractRequest):
+    url = public_http_url(request.url)
+    try:
+        async with AsyncWebCrawler(config=BrowserConfig(headless=True)) as crawler:
+            result = await crawler.arun(url=url, config=CrawlerRunConfig(word_count_threshold=1))
+    except Exception as error:
+        raise HTTPException(502, f'Crawl failed: {error}')
+    if not result.success:
+        raise HTTPException(502, f'Crawl failed: {result.error_message or "source page could not be read"}')
+
+    soup = BeautifulSoup(result.html or '', 'html.parser')
+    origin = urlparse(url)
+    candidates = []
+    for anchor in soup.select('a[href]'):
+        href = anchor.get('href', '')
+        if href.startswith('/'):
+            href = f'{origin.scheme}://{origin.netloc}{href}'
+        parsed = urlparse(href)
+        if parsed.scheme not in {'http', 'https'} or parsed.netloc != origin.netloc:
+            continue
+        path = parsed.path.lower()
+        if any(token in path for token in ('product', 'products', '/p/', 'item', 'sku')):
+            candidates.append(href.split('#')[0])
+    return {'productUrls': list(dict.fromkeys(candidates))[:20]}

@@ -70,3 +70,20 @@ export function categorizeCrawledProduct(name: string, description = '') {
   if (/food|beverage|coffee|tea|snack/.test(text)) return 'Food & Beverage'
   return 'Other'
 }
+
+export async function discoverSupplierProductUrls(catalogueUrl: string) {
+  const serviceUrl = process.env.CRAWL4AI_SERVICE_URL
+  if (!serviceUrl) throw new Error('Crawl4AI service is not configured. Set CRAWL4AI_SERVICE_URL after deploying the crawler service.')
+  const response = await fetch(new URL('/discover', serviceUrl), {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ url: catalogueUrl }),
+    cache: 'no-store',
+    signal: AbortSignal.timeout(60_000),
+  })
+  const body = await response.json().catch(() => ({})) as { productUrls?: unknown; error?: string }
+  if (!response.ok) throw new Error(body.error || 'Crawl4AI could not find product links from this approved source.')
+  const productUrls = Array.isArray(body.productUrls) ? body.productUrls.filter((value): value is string => typeof value === 'string' && validHttpUrl(value)) : []
+  if (!productUrls.length) throw new Error('Crawl4AI found no product links at this approved source.')
+  return productUrls.slice(0, 12)
+}

@@ -3,20 +3,21 @@ import { cookies } from 'next/headers'
 import { cookieName, isValidAdminSession } from '@/lib/admin-auth'
 import { adminRequest, insertAdminRecord } from '@/lib/supabase-admin'
 import { runOpportunityResearch } from '@/lib/openai'
-import { categorizeCrawledProduct, crawlSupplierProduct } from '@/lib/crawl4ai'
+import { categorizeCrawledProduct, crawlSupplierProduct, discoverSupplierProductUrls } from '@/lib/crawl4ai'
+import { approvedCrawlSourceAt } from '@/lib/crawl-sources'
 import { defaultMarkupPercent, extractSupplierListingDetails, sellingPriceFromCost } from '@/lib/supplier-listing'
 
 type AutomationTask = {
   id: string
   task_type: string
   attempts?: number
-  payload?: { order_id?: string; demand_signal?: string; source_url?: string }
+  payload?: { order_id?: string; demand_signal?: string; source_url?: string; source_index?: number }
 }
 
 const maximumAutomaticAttempts = 3
 
 function isRetryableFailure(message: string) {
-  return /fetch failed|timeout|timed out|aborted|temporar|rate limit|status: incomplete|returned no text output|unterminated string|openai request failed: (429|5\d\d)/i.test(message)
+  return /fetch failed|timeout|timed out|aborted|temporar|rate limit|status: incomplete|returned no text output|unterminated string|crawl failed|crawl4ai|openai request failed: (429|5\d\d)/i.test(message)
 }
 
 function allowed(request: Request) {
@@ -44,7 +45,7 @@ async function run(request: Request) {
     task = tasks[0] as AutomationTask | undefined
     if (!task) return NextResponse.json({ processed: false, message: 'No queued tasks' })
     attemptNumber = Number(task.attempts || 0) + 1
-    await adminRequest(`ai_tasks?id=eq.${task.id}&status=eq.queued`, { method: 'PATCH', headers: { Prefer: 'return=minimal' }, body: JSON.stringify({ status: 'running', attempts: attemptNumber, locked_at: new Date().toISOString(), locked_by: task.task_type === 'crawl_supplier_url' ? 'crawl4ai-operator' : 'openai-operator' }) })
+    await adminRequest(`ai_tasks?id=eq.${task.id}&status=eq.queued`, { method: 'PATCH', headers: { Prefer: 'return=minimal' }, body: JSON.stringify({ status: 'running', attempts: attemptNumber, locked_at: new Date().toISOString(), locked_by: task.task_type.startsWith('crawl_') ? 'crawl4ai-operator' : 'openai-operator' }) })
     if (task.task_type === 'monitor_paid_order') {
       const orderId = String(task.payload?.order_id || '')
       const deliveries = orderId ? await adminRequest(`supplier_deliveries?order_id=eq.${encodeURIComponent(orderId)}&select=status,created_at`) : []
@@ -53,11 +54,38 @@ async function run(request: Request) {
       await insertAdminRecord('ai_events', { task_id: task.id, event_type: awaitingDispatch ? 'paid_order_requires_dispatch' : 'paid_order_delivery_checked', actor: 'operations_monitor', payload: { order_id: orderId, delivery_count: Array.isArray(deliveries) ? deliveries.length : 0, requires_human_action: awaitingDispatch } })
       return NextResponse.json({ processed: true, orderId, requiresHumanAction: awaitingDispatch })
     }
+    if (task.task_type === 'crawl_catalogue_source') {
+      const source = approvedCrawlSourceAt(Number(task.payload?.source_index) || 0)
+      const candidates = await discoverSupplierProductUrls(source.catalogueUrl)
+      let result: Awaited<ReturnType<typeof crawlSupplierProduct>> | undefined
+      for (const candidate of candidates) {
+        try {
+          result = await crawlSupplierProduct(candidate)
+          break
+        } catch { }
+      }
+      if (!result) throw new Error(`Crawl4AI could not find a complete ZAR-priced product at ${source.name}.`)
+      const [existingOpportunities, existingProducts] = await Promise.all([
+        adminRequest(`supplier_opportunities?source_url=eq.${encodeURIComponent(result.sourceUrl)}&status=in.(researching,ready_for_review,approved)&select=id&limit=1`),
+        adminRequest(`products?supplier_source_url=eq.${encodeURIComponent(result.sourceUrl)}&select=id&limit=1`),
+      ])
+      if (existingOpportunities.length || existingProducts.length) throw new Error('This supplier product URL is already in the approval pipeline or product catalogue.')
+      const markupPercent = defaultMarkupPercent()
+      const retailPriceCents = sellingPriceFromCost(result.sourcePriceCents, markupPercent)
+      const supplier = (await insertAdminRecord('suppliers', { channel: 'crawler_discovered', status: 'pending_review', business_name: result.supplierName || source.name, website_url: result.supplierWebsite || source.catalogueUrl, source_url: result.sourceUrl }))[0]
+      const opportunity = (await insertAdminRecord('supplier_opportunities', { status: 'ready_for_review', title: result.productName, source_url: result.sourceUrl, demand_summary: `${source.category} source crawled from ${source.name} on ${result.checkedAt}. ${result.availability ? `Availability: ${result.availability}.` : ''}`.trim(), estimated_margin: markupPercent, confidence: 1, proposed_supplier_id: supplier.id, proposed_product: { name: result.productName, description: result.productDescription || '', category: source.category || categorizeCrawledProduct(result.productName, result.productDescription), supplier_cost_cents: result.sourcePriceCents, markup_percent: markupPercent, retail_price_cents: retailPriceCents, image_url: result.imageUrls[0], source_image_urls: result.imageUrls, source_price_cents: result.sourcePriceCents, source_currency: result.currency, source_checked_at: result.checkedAt, availability: result.availability || null } }))[0]
+      await insertAdminRecord('supplier_source_checks', { source_url: result.sourceUrl, supplier_id: supplier.id, source_price_cents: result.sourcePriceCents, source_currency: result.currency, source_image_urls: result.imageUrls, availability: result.availability || null, checked_at: result.checkedAt, raw_data: result })
+      await adminRequest(`ai_tasks?id=eq.${task.id}`, { method: 'PATCH', headers: { Prefer: 'return=minimal' }, body: JSON.stringify({ status: 'completed', completed_at: new Date().toISOString() }) })
+      await insertAdminRecord('ai_events', { task_id: task.id, event_type: 'supplier_catalogue_crawled', actor: 'crawl4ai_operator', payload: { opportunity_id: opportunity.id, supplier_id: supplier.id, source_name: source.name, source_category: source.category } })
+      return NextResponse.json({ processed: true, opportunityId: opportunity.id, provider: 'crawl4ai', source: source.name, category: source.category })
+    }
     if (task.task_type === 'crawl_supplier_url') {
       const sourceUrl = String(task.payload?.source_url || '')
       const existing = sourceUrl ? await adminRequest(`supplier_opportunities?source_url=eq.${encodeURIComponent(sourceUrl)}&status=in.(researching,ready_for_review,approved)&select=id&limit=1`) : []
       if (existing.length) throw new Error('This supplier product URL is already in the approval pipeline.')
       const result = await crawlSupplierProduct(sourceUrl)
+      const existingProducts = await adminRequest(`products?supplier_source_url=eq.${encodeURIComponent(result.sourceUrl)}&select=id&limit=1`)
+      if (existingProducts.length) throw new Error('This supplier product URL is already in the product catalogue.')
       const category = categorizeCrawledProduct(result.productName, result.productDescription)
       const markupPercent = defaultMarkupPercent()
       const retailPriceCents = sellingPriceFromCost(result.sourcePriceCents, markupPercent)
