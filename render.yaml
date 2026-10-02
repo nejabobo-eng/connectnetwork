@@ -1,0 +1,7 @@
+services:
+  - type: web
+    name: connectnetwork-crawler
+    runtime: docker
+    dockerfilePath: ./crawler/Dockerfile
+    dockerContext: ./crawler
+    healthCheckPath: /health
