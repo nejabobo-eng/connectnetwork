@@ -9,7 +9,6 @@ type CrawlSource = {
 }
 
 export const approvedCrawlSources: CrawlSource[] = [
-  { name: 'Takealot', category: 'Electronics', catalogueUrl: 'https://www.takealot.com/' },
   { name: 'Makro', category: 'Home & Living', catalogueUrl: 'https://www.makro.co.za/' },
   { name: 'Superbalist', category: 'Fashion', catalogueUrl: 'https://www.superbalist.com/' },
   { name: 'Clicks', category: 'Beauty & Personal Care', catalogueUrl: 'https://clicks.co.za/' },

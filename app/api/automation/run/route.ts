@@ -17,7 +17,7 @@ type AutomationTask = {
 const maximumAutomaticAttempts = 3
 
 function isRetryableFailure(message: string) {
-  return /fetch failed|timeout|timed out|aborted|temporar|rate limit|status: incomplete|returned no text output|unterminated string|crawl failed|crawl4ai|openai request failed: (429|5\d\d)/i.test(message)
+  return /fetch failed|timeout|timed out|aborted|temporar|rate limit|status: incomplete|returned no text output|unterminated string|openai request failed: (429|5\d\d)/i.test(message)
 }
 
 function allowed(request: Request) {

@@ -32,8 +32,8 @@ export async function crawlSupplierProduct(sourceUrl: string): Promise<CrawledSu
     cache: 'no-store',
     signal: AbortSignal.timeout(60_000),
   })
-  const body = await response.json().catch(() => ({})) as Partial<CrawledSupplierProduct> & { error?: string }
-  if (!response.ok) throw new Error(body.error || 'Crawl4AI could not extract this supplier page.')
+  const body = await response.json().catch(() => ({})) as Partial<CrawledSupplierProduct> & { error?: string; detail?: string }
+  if (!response.ok) throw new Error(body.detail || body.error || 'Crawl4AI could not extract this supplier page.')
 
   const price = Number(body.sourcePriceCents)
   const images = Array.isArray(body.imageUrls) ? body.imageUrls.filter((value): value is string => typeof value === 'string' && validHttpUrl(value)) : []
@@ -81,8 +81,8 @@ export async function discoverSupplierProductUrls(catalogueUrl: string) {
     cache: 'no-store',
     signal: AbortSignal.timeout(60_000),
   })
-  const body = await response.json().catch(() => ({})) as { productUrls?: unknown; error?: string }
-  if (!response.ok) throw new Error(body.error || 'Crawl4AI could not find product links from this approved source.')
+  const body = await response.json().catch(() => ({})) as { productUrls?: unknown; error?: string; detail?: string }
+  if (!response.ok) throw new Error(body.detail || body.error || 'Crawl4AI could not find product links from this approved source.')
   const productUrls = Array.isArray(body.productUrls) ? body.productUrls.filter((value): value is string => typeof value === 'string' && validHttpUrl(value)) : []
   if (!productUrls.length) throw new Error('Crawl4AI found no product links at this approved source.')
   return productUrls.slice(0, 12)

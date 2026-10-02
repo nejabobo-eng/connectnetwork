@@ -235,8 +235,8 @@ export async function POST(request: Request) {
   const body = await request.json().catch(() => ({}))
   try {
     if (body.action === 'queue-crawl-catalogue') {
-      const completedCrawls = await adminRequest('ai_events?event_type=eq.supplier_catalogue_crawled&select=id')
-      const sourceIndex = completedCrawls.length % approvedCrawlSources.length
+      const queuedCrawls = await adminRequest('ai_events?event_type=eq.supplier_catalogue_crawl_queued&select=id')
+      const sourceIndex = queuedCrawls.length % approvedCrawlSources.length
       const source = approvedCrawlSources[sourceIndex]
       const [task] = await insertAdminRecord('ai_tasks', { task_type: 'crawl_catalogue_source', payload: { source_index: sourceIndex } })
       await insertAdminRecord('ai_events', { task_id: task.id, event_type: 'supplier_catalogue_crawl_queued', actor: 'admin', payload: { source_name: source.name, source_category: source.category } })
