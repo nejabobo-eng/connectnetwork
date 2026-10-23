@@ -33,7 +33,7 @@ export async function POST(request: Request) {
     }
     const deliveryAddress = { line1: typeof address?.line1 === 'string' ? address.line1.trim() : '', suburb: typeof address?.suburb === 'string' ? address.suburb.trim() : '', city: typeof address?.city === 'string' ? address.city.trim() : '', postalCode: typeof address?.postalCode === 'string' ? address.postalCode.trim() : '', mapUrl }
     const deliveryPhone = typeof body.deliveryPhone === 'string' ? body.deliveryPhone.trim() : ''
-    if (Object.values(deliveryAddress).some(value => !value) || deliveryPhone.length < 8) return NextResponse.json({ error: 'Enter your full delivery address and phone number before checking out.' }, { status: 400 })
+    if (!deliveryAddress.line1 || !deliveryAddress.suburb || !deliveryAddress.city || !deliveryAddress.postalCode || deliveryPhone.length < 8) return NextResponse.json({ error: 'Enter your full delivery address and phone number before checking out.' }, { status: 400 })
     const ids = items.map(item => item.productId).join(',')
     const products = await adminRequest(`products?id=in.(${ids})&active=eq.true&select=id,supplier_id,name,retail_price_cents,stock_quantity,shipping_weight_grams,shipping_length_cm,shipping_width_cm,shipping_height_cm,bulky_surcharge_cents,delivery_override_cents`) as Product[]
     if (products.length !== items.length) throw new Error('One or more products are no longer available')
