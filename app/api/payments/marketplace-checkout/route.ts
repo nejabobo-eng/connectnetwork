@@ -35,7 +35,7 @@ export async function POST(request: Request) {
     const deliveryPhone = typeof body.deliveryPhone === 'string' ? body.deliveryPhone.trim() : ''
     if (!deliveryAddress.line1 || !deliveryAddress.suburb || !deliveryAddress.city || !deliveryAddress.postalCode || deliveryPhone.length < 8) return NextResponse.json({ error: 'Enter your full delivery address and phone number before checking out.' }, { status: 400 })
     const ids = items.map(item => item.productId).join(',')
-    const products = await adminRequest(`products?id=in.(${ids})&active=eq.true&select=id,supplier_id,name,retail_price_cents,stock_quantity,shipping_weight_grams,shipping_length_cm,shipping_width_cm,shipping_height_cm,bulky_surcharge_cents,delivery_override_cents`) as Product[]
+    const products = await adminRequest(`products?id=in.(${ids})&active=eq.true&select=id,supplier_id,name,retail_price_cents,stock_quantity`) as Product[]
     if (products.length !== items.length) throw new Error('One or more products are no longer available')
     const selected = items.map(item => ({ ...item, product: products.find(product => product.id === item.productId) }))
     if (selected.some(item => !item.product || item.quantity > (item.product.stock_quantity ?? Number.MAX_SAFE_INTEGER))) throw new Error('One or more products are unavailable')
