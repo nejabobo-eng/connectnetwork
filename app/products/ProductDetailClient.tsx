@@ -17,6 +17,7 @@ export default function ProductDetailClient({ productId }: { productId: string }
       if (!response.ok || !item) throw new Error()
       setProduct(item)
       setMessage('')
+      void fetch(`/api/products/${item.id}/view`, { method: 'POST' })
     }).catch(() => setMessage('This product is no longer available.'))
   }, [productId])
 
