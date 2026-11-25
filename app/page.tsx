@@ -1,4 +1,3 @@
-export const metadata = { title: 'ConnectNetwork — Coming Soon', description: 'Coming soon.' }
-export default function HomePage() {
-  return <main style={{minHeight:'100dvh',display:'flex',flexDirection:'column',alignItems:'center',justifyContent:'center',gap:24,padding:24,background:'#fff',color:'#222',fontFamily:'Arial,sans-serif'}}><img src="/logo/logo.jpg" alt="Connect Network" style={{width:320,maxWidth:'85vw',height:'auto'}} /><h1 style={{fontSize:28,fontWeight:600,margin:0}}>Coming Soon</h1></main>
-}
+import Link from 'next/link'
+export const metadata={title:'Connect Network | DemandFirst',description:'From community demand to business creation.'}
+export default function HomePage(){return <main style={{maxWidth:960,margin:'auto',padding:32,fontFamily:'Arial,sans-serif'}}><img src="/logo/logo.jpg" alt="Connect Network" style={{width:220,maxWidth:'100%'}}/><h1>Where demand meets opportunity</h1><p>Tell us what your community needs. Help local businesses discover real opportunities.</p><Link href="/demand">Submit a product or service request</Link><h2>Registered supplier marketplace</h2><p>Supplier listings will appear here as verified suppliers join.</p><h2>Enterprise Genesis Engine</h2><p>Discover business opportunities based on demonstrated market demand.</p></main>}
