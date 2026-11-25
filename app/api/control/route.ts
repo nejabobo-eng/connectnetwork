@@ -4,7 +4,7 @@ import { adminRequest, insertAdminRecord } from '@/lib/supabase-admin'
 import { sellingPriceFromCost } from '@/lib/supplier-listing'
 import { requestDeliveryQuote, type DeliveryQuote } from '@/lib/delivery-quote'
 
-const productCategories = ['Electronics', 'Home & Living', 'Fashion', 'Beauty & Personal Care', 'Health & Wellness', 'Baby & Kids', 'Sports & Outdoors', 'Automotive', 'Tools & Hardware', 'Office & Business', 'Food & Beverage', 'Other']
+const productCategories = ["Electronics","Computers & Laptops","Phones & Tablets","Computer & Mobile Accessories","Networking & Connectivity","TV & Audio","Gaming","Security & Smart Devices","Electronic Components","Chargers & Backup Power"]
 
 async function createManualProduct(body: Record<string, unknown>) {
   const name = typeof body.name === 'string' ? body.name.trim() : ''
@@ -22,7 +22,8 @@ async function createManualProduct(body: Record<string, unknown>) {
   if (![shippingWeightGrams, shippingLengthCm, shippingWidthCm, shippingHeightCm].every(value => Number.isFinite(value) && value > 0)) throw new Error('Enter a valid product weight and package dimensions.')
   if (!Number.isInteger(bulkySurchargeCents) || bulkySurchargeCents < 0 || (deliveryOverrideCents !== null && (!Number.isInteger(deliveryOverrideCents) || deliveryOverrideCents < 0))) throw new Error('Enter valid bulky and delivery override amounts.')
   const requestedCategory = typeof body.category === 'string' ? body.category.trim() : ''
-  const category = productCategories.includes(requestedCategory) ? requestedCategory : 'Other'
+  if (!productCategories.includes(requestedCategory)) throw new Error('Select an electronics category.')
+  const category = requestedCategory
   const supplierUrl = typeof body.supplierUrl === 'string' ? body.supplierUrl.trim() : ''
   if (!supplierUrl) throw new Error('Add the original supplier product URL for fulfilment records.')
   const [supplier] = await insertAdminRecord('suppliers', { channel: 'connected', status: 'approved', business_name: supplierName, contact_name: typeof body.supplierContact === 'string' ? body.supplierContact.trim() || null : null, phone: typeof body.supplierPhone === 'string' ? body.supplierPhone.trim() || null : null, website_url: supplierUrl || null, source_url: supplierUrl || null, reviewed_at: new Date().toISOString() })
@@ -117,7 +118,8 @@ async function updateProduct(body: Record<string, unknown>) {
     changes.name = name
   }
   if (typeof body.description === 'string') changes.description = body.description.trim() || null
-  if (typeof body.category === 'string') changes.category = productCategories.includes(body.category.trim()) ? body.category.trim() : 'Other'
+  if (typeof body.category !== 'string' || !productCategories.includes(body.category.trim())) throw new Error('Select an electronics category.')
+  changes.category = body.category.trim()
   if (body.stockQuantity !== undefined) {
     const stockQuantity = Number(body.stockQuantity)
     if (!Number.isInteger(stockQuantity) || stockQuantity < 0) throw new Error('Enter a valid stock quantity.')
@@ -174,7 +176,7 @@ export async function GET(request: Request) {
       fulfilmentOrders(),
       adminRequest('products?select=id,name,description,category,image_url,retail_price_cents,supplier_cost_cents,stock_quantity,view_count,lifecycle_status,updated_at,supplier:suppliers(id,business_name,source_url,website_url)&order=updated_at.desc'),
     ])
-    return NextResponse.json({ orders, products, metrics: { suppliers: suppliers.length, activePromotions: promotions.filter((promotion: Record<string, unknown>) => promotion.status === 'active').length, successfulPayments: payments.filter((payment: Record<string, unknown>) => payment.state === 'succeeded').length } })
+    return NextResponse.json({ orders, products: products.filter((product: { category?: string }) => productCategories.includes(product.category || '')), metrics: { suppliers: suppliers.length, activePromotions: promotions.filter((promotion: Record<string, unknown>) => promotion.status === 'active').length, successfulPayments: payments.filter((payment: Record<string, unknown>) => payment.state === 'succeeded').length } })
   } catch { return NextResponse.json({ error: 'Control plane is not configured' }, { status: 503 }) }
 }
 
