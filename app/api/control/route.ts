@@ -169,14 +169,15 @@ async function permanentlyDeleteProduct(productId: string) {
 export async function GET(request: Request) {
   if (!hasControlApiAccess(request)) return NextResponse.json({ error: 'Unauthorised' }, { status: 401 })
   try {
-    const [suppliers, promotions, payments, orders, products] = await Promise.all([
+    const [suppliers, promotions, payments, orders, products, supplierApplications] = await Promise.all([
       adminRequest('suppliers?select=id'),
       adminRequest('promotions?select=id,status'),
       adminRequest('payment_transactions?select=id,state'),
       fulfilmentOrders(),
       adminRequest('products?select=id,name,description,category,image_url,retail_price_cents,supplier_cost_cents,stock_quantity,view_count,lifecycle_status,updated_at,supplier:suppliers(id,business_name,source_url,website_url)&order=updated_at.desc'),
+      adminRequest('supplier_applications?select=*&order=created_at.desc&limit=200'),
     ])
-    return NextResponse.json({ orders, products: products.filter((product: { category?: string }) => productCategories.includes(product.category || '')), metrics: { suppliers: suppliers.length, activePromotions: promotions.filter((promotion: Record<string, unknown>) => promotion.status === 'active').length, successfulPayments: payments.filter((payment: Record<string, unknown>) => payment.state === 'succeeded').length } })
+    return NextResponse.json({ supplierApplications, orders, products: products.filter((product: { category?: string }) => productCategories.includes(product.category || '')), metrics: { suppliers: suppliers.length, activePromotions: promotions.filter((promotion: Record<string, unknown>) => promotion.status === 'active').length, successfulPayments: payments.filter((payment: Record<string, unknown>) => payment.state === 'succeeded').length } })
   } catch { return NextResponse.json({ error: 'Control plane is not configured' }, { status: 503 }) }
 }
 
@@ -184,7 +185,16 @@ export async function POST(request: Request) {
   if (!hasControlApiAccess(request)) return NextResponse.json({ error: 'Unauthorised' }, { status: 401 })
   const body = await request.json().catch(() => ({}))
   try {
-    if (body.action === 'create-manual-product') return NextResponse.json({ ok: true, ...(await createManualProduct(body)) })
+    if (body.action === 'review-supplier-application') {
+      const id=String(body.applicationId||'')
+      const decision=String(body.decision||'')
+      if(!/^[0-9a-f-]{36}$/i.test(id)||!['approved','rejected'].includes(decision)) return NextResponse.json({error:'Invalid review'}, {status:400})
+      if(decision==='approved' && body.verified!==true) return NextResponse.json({error:'Confirm independent verification first'}, {status:400})
+      const rows=await adminRequest('supplier_applications?id=eq.'+encodeURIComponent(id)+'&status=eq.pending_review',{method:'PATCH',headers:{Prefer:'return=representation'},body:JSON.stringify({status:decision})})
+      if(!rows?.length) return NextResponse.json({error:'Application not pending'}, {status:409})
+      return NextResponse.json({ok:true})
+    }
+    if (body.action === 'create-manual-product') return NextResponse.json({ error: 'Legacy sourcing is disabled. Use registered suppliers.' }, {status:409})
     if (body.action === 'update-product') { await updateProduct(body); return NextResponse.json({ ok: true }) }
     if (body.action === 'archive-products-without-cost') { await archiveProductsWithoutCost(); return NextResponse.json({ ok: true }) }
     if (body.action === 'permanently-delete-product' && typeof body.productId === 'string') { await permanentlyDeleteProduct(body.productId); return NextResponse.json({ ok: true }) }
