@@ -180,7 +180,8 @@ export async function GET(request: Request) {
       adminRequest('supplier_applications?select=*&order=created_at.desc&limit=200'),
     ])
     const ceiApplications=await adminRequest('cei_applications?select=*&order=created_at.desc&limit=200'); const ceiContracts=await adminRequest('cei_contracts?select=*&order=starts_at.desc&limit=200');
-    return NextResponse.json({ ceiApplications,ceiContracts,marketSignals, supplierApplications, orders, products: products.filter((product: { category?: string }) => productCategories.includes(product.category || '')), metrics: { suppliers: suppliers.length, activePromotions: promotions.filter((promotion: Record<string, unknown>) => promotion.status === 'active').length, successfulPayments: payments.filter((payment: Record<string, unknown>) => payment.state === 'succeeded').length } })
+    const activationSettings=await adminRequest('supplier_activation_settings?id=eq.1&select=*'); const activationReceipts=await adminRequest('supplier_activation_receipts?select=*&limit=200');
+    return NextResponse.json({ activationSettings,activationReceipts,ceiApplications,ceiContracts,marketSignals, supplierApplications, orders, products: products.filter((product: { category?: string }) => productCategories.includes(product.category || '')), metrics: { suppliers: suppliers.length, activePromotions: promotions.filter((promotion: Record<string, unknown>) => promotion.status === 'active').length, successfulPayments: payments.filter((payment: Record<string, unknown>) => payment.state === 'succeeded').length } })
   } catch { return NextResponse.json({ error: 'Control plane is not configured' }, { status: 503 }) }
 }
 
@@ -208,11 +209,17 @@ export async function POST(request: Request) {
       if(!rows?.length)return NextResponse.json({error:'No current market evidence found'},{status:404})
       return NextResponse.json(await analyseOpportunity(rows[0]))
     }
+    if(body.action==='supplier-activation-settings'){
+      if(!['founding_free','paid'].includes(body.mode)||!Number.isSafeInteger(body.feeCents)||body.feeCents<0||body.feeCents>2147483647||(body.mode==='paid'&&body.feeCents===0))return NextResponse.json({error:'Invalid activation fee'},{status:400})
+      await adminRequest('supplier_activation_settings?id=eq.1',{method:'PATCH',body:JSON.stringify({mode:body.mode,fee_cents:body.feeCents})})
+      return NextResponse.json({ok:true})
+    }
     if(body.action==='activate-supplier'){
       const id=String(body.applicationId||''), owner=String(body.ownerId||'')
       const uuid=/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i
       if(!uuid.test(id)||!uuid.test(owner)) return NextResponse.json({error:'Valid application and account IDs required'},{status:400})
-      const supplierId=await adminRequest('rpc/activate_supplier_application',{method:'POST',body:JSON.stringify({p_application_id:id,p_owner_id:owner})})
+      if(body.mode==='manual_paid'&&body.paymentVerified!==true)return NextResponse.json({error:'Verify cleared payment first'},{status:400})
+      const supplierId=await adminRequest('rpc/commercial_activate_supplier',{method:'POST',body:JSON.stringify({p_application_id:id,p_owner_id:owner,p_mode:body.mode||'founding_free',p_amount:body.amountCents??0,p_reference:body.paymentReference||null,p_reason:body.reason||null})})
       return NextResponse.json({ok:true,supplierId})
     }
     if (body.action === 'review-supplier-application') {
