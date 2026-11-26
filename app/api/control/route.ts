@@ -182,7 +182,8 @@ export async function GET(request: Request) {
     const ceiApplications=await adminRequest('cei_applications?select=*&order=created_at.desc&limit=200'); const ceiContracts=await adminRequest('cei_contracts?select=*&order=starts_at.desc&limit=200');
     const activationSettings=await adminRequest('supplier_activation_settings?id=eq.1&select=*'); const activationReceipts=await adminRequest('supplier_activation_receipts?select=*&limit=200');
     const enquiries=await adminRequest('procurement_enquiries?select=*&order=created_at.desc&limit=200');const candidates=await adminRequest('procurement_supplier_candidates?select=*&limit=500');const memberships=await adminRequest('supplier_membership_payments?select=*&order=ends_at.desc&limit=500');
-    return NextResponse.json({ enquiries,candidates,memberships,activationSettings,activationReceipts,ceiApplications,ceiContracts,marketSignals, supplierApplications, orders, products: products.filter((product: { category?: string }) => productCategories.includes(product.category || '')), metrics: { suppliers: suppliers.length, activePromotions: promotions.filter((promotion: Record<string, unknown>) => promotion.status === 'active').length, successfulPayments: payments.filter((payment: Record<string, unknown>) => payment.state === 'succeeded').length } })
+    const procurementDemand=await adminRequest('procurement_demand_summary?select=*&limit=200'); const procurementQuotes=await adminRequest('procurement_quotes?select=*&limit=500');
+    return NextResponse.json({ procurementDemand,procurementQuotes,enquiries,candidates,memberships,activationSettings,activationReceipts,ceiApplications,ceiContracts,marketSignals, supplierApplications, orders, products: products.filter((product: { category?: string }) => productCategories.includes(product.category || '')), metrics: { suppliers: suppliers.length, activePromotions: promotions.filter((promotion: Record<string, unknown>) => promotion.status === 'active').length, successfulPayments: payments.filter((payment: Record<string, unknown>) => payment.state === 'succeeded').length } })
   } catch { return NextResponse.json({ error: 'Control plane is not configured' }, { status: 503 }) }
 }
 
@@ -209,6 +210,19 @@ export async function POST(request: Request) {
       const rows=await adminRequest('ege_opportunities?'+params.toString())
       if(!rows?.length)return NextResponse.json({error:'No current market evidence found'},{status:404})
       return NextResponse.json(await analyseOpportunity(rows[0]))
+    }
+    if(['ipe-match','ipe-quote','ipe-verify','ipe-revoke'].includes(body.action)){
+      if(!/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(String(body.id)))return NextResponse.json({error:'Invalid enquiry'},{status:400})
+      if(body.action==='ipe-match')return NextResponse.json({matches:await adminRequest('rpc/procurement_matches',{method:'POST',body:JSON.stringify({p_enquiry_id:body.id})})})
+      if(body.action==='ipe-revoke'){await adminRequest('procurement_verified_demand?enquiry_id=eq.'+encodeURIComponent(body.id),{method:'PATCH',body:JSON.stringify({revoked_at:new Date().toISOString()})});return NextResponse.json({ok:true})}
+      if(body.action==='ipe-quote'){
+        const candidates=await adminRequest('procurement_supplier_candidates?enquiry_id=eq.'+encodeURIComponent(body.id)+'&id=eq.'+encodeURIComponent(String(body.candidateId))+'&select=id')
+        if(!candidates.length||!Number.isSafeInteger(body.totalCents)||body.totalCents<0||typeof body.deliveryIncluded!=='boolean'||typeof body.vatIncluded!=='boolean')return NextResponse.json({error:'Invalid quote'}, {status:400})
+        await insertAdminRecord('procurement_quotes',{enquiry_id:body.id,candidate_id:body.candidateId,scope:body.scope,total_cents:body.totalCents,delivery_included:body.deliveryIncluded,vat_included:body.vatIncluded,valid_until:body.validUntil,evidence_reference:body.evidenceReference});return NextResponse.json({ok:true})
+      }
+      if(body.confirmed!==true||!Number.isSafeInteger(body.quantity)||body.quantity<=0)return NextResponse.json({error:'Verify purchase intention and quantity first'},{status:400})
+      for(const k of ['category','kind','item','unit','frequency','requiredBy','evidenceReference'])if(typeof body[k]!=='string'||!body[k].trim()||body[k].length>300)return NextResponse.json({error:'Complete verification fields'},{status:400})
+      await insertAdminRecord('procurement_verified_demand',{enquiry_id:body.id,category:body.category,kind:body.kind,item:body.item,quantity:body.quantity,unit:body.unit,frequency:body.frequency,required_by:body.requiredBy,evidence_reference:body.evidenceReference});return NextResponse.json({ok:true})
     }
     if(body.action==='renew-supplier'){
       if(body.paymentVerified!==true||typeof body.paymentReference!=='string'||!body.paymentReference.trim()||typeof body.supplierId!=='string')return NextResponse.json({error:'Verified R100 payment required'},{status:400})
