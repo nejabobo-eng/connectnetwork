@@ -1,3 +1,4 @@
+import { analyseOpportunity } from '@/lib/ege-ai'
 import { NextResponse } from 'next/server'
 import { hasControlApiAccess } from '@/lib/control-api'
 import { adminRequest, insertAdminRecord } from '@/lib/supabase-admin'
@@ -186,6 +187,14 @@ export async function POST(request: Request) {
   if (!hasControlApiAccess(request)) return NextResponse.json({ error: 'Unauthorised' }, { status: 401 })
   const body = await request.json().catch(() => ({}))
   try {
+    if(body.action==='analyse-ege'){
+      const fields=['province','municipality','category','kind','requested_item','unit','frequency','currency']
+      const params=new URLSearchParams({select:'*',limit:'1'})
+      for(const field of fields){const value=body[field];if(typeof value!=='string'||!value.trim()||value.length>200)return NextResponse.json({error:'Invalid opportunity selection'},{status:400});params.set(field,'eq.'+value)}
+      const rows=await adminRequest('ege_opportunities?'+params.toString())
+      if(!rows?.length)return NextResponse.json({error:'No current market evidence found'},{status:404})
+      return NextResponse.json(await analyseOpportunity(rows[0]))
+    }
     if(body.action==='activate-supplier'){
       const id=String(body.applicationId||''), owner=String(body.ownerId||'')
       const uuid=/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i
