@@ -15,7 +15,7 @@ if(error)throw new Error('Unable to submit application. Please try again.')
 form.reset();setMessage('Application received. Your business is pending review and is not yet approved to sell.')
 }catch(err){setMessage(err instanceof Error?err.message:'Submission failed.')}finally{setBusy(false)}
 }
-return <main style={{maxWidth:680,margin:'auto',padding:24}}><a href="/">Connect Network</a><h1>Register as a supplier</h1><p>Supply your community and reach new customers.</p><form onSubmit={submit} style={{display:'grid',gap:16}}>
+return <main style={{maxWidth:680,margin:'auto',padding:24}}><a href="/">Connect Network</a><h1>Register as a supplier</h1><p>Supply your community and reach new customers.</p><p>Registration is free. Active supplier membership costs R100 per month, subject to verification and payment.</p><form onSubmit={submit} style={{display:'grid',gap:16}}>
 <label>Business or trading name <input name="business_name" required minLength={2} maxLength={150}/></label>
 <label>Business type <select name="business_type"><option value="individual">Individual / sole trader</option><option value="registered_business">Registered business</option></select></label>
 <label>Contact person <input name="contact_name" required minLength={2} maxLength={150}/></label>
