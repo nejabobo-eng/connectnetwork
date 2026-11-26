@@ -169,6 +169,7 @@ async function permanentlyDeleteProduct(productId: string) {
 export async function GET(request: Request) {
   if (!hasControlApiAccess(request)) return NextResponse.json({ error: 'Unauthorised' }, { status: 401 })
   try {
+    const marketSignals = await adminRequest('geographical_demand_matching?select=*&order=verified_intentions.desc,request_count.desc&limit=200')
     const [suppliers, promotions, payments, orders, products, supplierApplications] = await Promise.all([
       adminRequest('suppliers?select=id'),
       adminRequest('promotions?select=id,status'),
@@ -177,7 +178,7 @@ export async function GET(request: Request) {
       adminRequest('products?select=id,name,description,category,image_url,retail_price_cents,supplier_cost_cents,stock_quantity,view_count,lifecycle_status,updated_at,supplier:suppliers(id,business_name,source_url,website_url)&order=updated_at.desc'),
       adminRequest('supplier_applications?select=*&order=created_at.desc&limit=200'),
     ])
-    return NextResponse.json({ supplierApplications, orders, products: products.filter((product: { category?: string }) => productCategories.includes(product.category || '')), metrics: { suppliers: suppliers.length, activePromotions: promotions.filter((promotion: Record<string, unknown>) => promotion.status === 'active').length, successfulPayments: payments.filter((payment: Record<string, unknown>) => payment.state === 'succeeded').length } })
+    return NextResponse.json({ marketSignals, supplierApplications, orders, products: products.filter((product: { category?: string }) => productCategories.includes(product.category || '')), metrics: { suppliers: suppliers.length, activePromotions: promotions.filter((promotion: Record<string, unknown>) => promotion.status === 'active').length, successfulPayments: payments.filter((payment: Record<string, unknown>) => payment.state === 'succeeded').length } })
   } catch { return NextResponse.json({ error: 'Control plane is not configured' }, { status: 503 }) }
 }
 
