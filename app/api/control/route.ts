@@ -4,6 +4,7 @@ import { hasControlApiAccess } from '@/lib/control-api'
 import { adminRequest, insertAdminRecord } from '@/lib/supabase-admin'
 import { sellingPriceFromCost } from '@/lib/supplier-listing'
 import { requestDeliveryQuote, type DeliveryQuote } from '@/lib/delivery-quote'
+import { createSourcingPlan, sendQueuedRfq, type ExternalCandidateInput } from '@/lib/sourcing-agent'
 
 const productCategories = ["Electronics","Computers & Laptops","Phones & Tablets","Computer & Mobile Accessories","Networking & Connectivity","TV & Audio","Gaming","Security & Smart Devices","Electronic Components","Chargers & Backup Power"]
 
@@ -183,7 +184,8 @@ export async function GET(request: Request) {
     const activationSettings=await adminRequest('supplier_activation_settings?id=eq.1&select=*'); const activationReceipts=await adminRequest('supplier_activation_receipts?select=*&limit=200');
     const enquiries=await adminRequest('procurement_enquiries?select=*&order=created_at.desc&limit=200');const candidates=await adminRequest('procurement_supplier_candidates?select=*&limit=500');const memberships=await adminRequest('supplier_membership_payments?select=*&order=ends_at.desc&limit=500');
     const procurementDemand=await adminRequest('procurement_demand_summary?select=*&limit=200'); const procurementQuotes=await adminRequest('procurement_quotes?select=*&limit=500');
-    return NextResponse.json({ procurementDemand,procurementQuotes,enquiries,candidates,memberships,activationSettings,activationReceipts,ceiApplications,ceiContracts,marketSignals, supplierApplications, orders, products: products.filter((product: { category?: string }) => productCategories.includes(product.category || '')), metrics: { suppliers: suppliers.length, activePromotions: promotions.filter((promotion: Record<string, unknown>) => promotion.status === 'active').length, successfulPayments: payments.filter((payment: Record<string, unknown>) => payment.state === 'succeeded').length } })
+    const [rfqQueue, supplyGaps]=await Promise.all([adminRequest('procurement_rfq_queue?select=*&order=created_at.desc&limit=500'),adminRequest('procurement_supply_gaps?select=*&order=created_at.desc&limit=200')]);
+    return NextResponse.json({ procurementDemand,procurementQuotes,enquiries,candidates,memberships,rfqQueue,supplyGaps,activationSettings,activationReceipts,ceiApplications,ceiContracts,marketSignals, supplierApplications, orders, products: products.filter((product: { category?: string }) => productCategories.includes(product.category || '')), metrics: { suppliers: suppliers.length, activePromotions: promotions.filter((promotion: Record<string, unknown>) => promotion.status === 'active').length, successfulPayments: payments.filter((payment: Record<string, unknown>) => payment.state === 'succeeded').length } })
   } catch { return NextResponse.json({ error: 'Control plane is not configured' }, { status: 503 }) }
 }
 
@@ -191,6 +193,15 @@ export async function POST(request: Request) {
   if (!hasControlApiAccess(request)) return NextResponse.json({ error: 'Unauthorised' }, { status: 401 })
   const body = await request.json().catch(() => ({}))
   try {
+    if(body.action==='source-enquiry'){
+      if(!/^[0-9a-f-]{36}$/i.test(String(body.enquiryId)))return NextResponse.json({error:'Invalid enquiry'}, {status:400})
+      const external=Array.isArray(body.externalCandidates)?body.externalCandidates.slice(0,5) as ExternalCandidateInput[]:[]
+      return NextResponse.json(await createSourcingPlan(body.enquiryId,external))
+    }
+    if(body.action==='dispatch-rfq'){
+      if(!/^[0-9a-f-]{36}$/i.test(String(body.queueId)))return NextResponse.json({error:'Invalid RFQ queue item'}, {status:400})
+      return NextResponse.json(await sendQueuedRfq(body.queueId))
+    }
     if(body.action==='cei-contract'){
       const uuid=/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i
       if(!uuid.test(String(body.applicationId))||body.paymentVerified!==true||!Number.isSafeInteger(body.amountCents)||body.amountCents<=0) return NextResponse.json({error:'Verified payment and valid application required'},{status:400})
