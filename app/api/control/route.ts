@@ -181,7 +181,8 @@ export async function GET(request: Request) {
     ])
     const ceiApplications=await adminRequest('cei_applications?select=*&order=created_at.desc&limit=200'); const ceiContracts=await adminRequest('cei_contracts?select=*&order=starts_at.desc&limit=200');
     const activationSettings=await adminRequest('supplier_activation_settings?id=eq.1&select=*'); const activationReceipts=await adminRequest('supplier_activation_receipts?select=*&limit=200');
-    return NextResponse.json({ activationSettings,activationReceipts,ceiApplications,ceiContracts,marketSignals, supplierApplications, orders, products: products.filter((product: { category?: string }) => productCategories.includes(product.category || '')), metrics: { suppliers: suppliers.length, activePromotions: promotions.filter((promotion: Record<string, unknown>) => promotion.status === 'active').length, successfulPayments: payments.filter((payment: Record<string, unknown>) => payment.state === 'succeeded').length } })
+    const enquiries=await adminRequest('procurement_enquiries?select=*&order=created_at.desc&limit=200');const candidates=await adminRequest('procurement_supplier_candidates?select=*&limit=500');const memberships=await adminRequest('supplier_membership_payments?select=*&order=ends_at.desc&limit=500');
+    return NextResponse.json({ enquiries,candidates,memberships,activationSettings,activationReceipts,ceiApplications,ceiContracts,marketSignals, supplierApplications, orders, products: products.filter((product: { category?: string }) => productCategories.includes(product.category || '')), metrics: { suppliers: suppliers.length, activePromotions: promotions.filter((promotion: Record<string, unknown>) => promotion.status === 'active').length, successfulPayments: payments.filter((payment: Record<string, unknown>) => payment.state === 'succeeded').length } })
   } catch { return NextResponse.json({ error: 'Control plane is not configured' }, { status: 503 }) }
 }
 
@@ -208,6 +209,18 @@ export async function POST(request: Request) {
       const rows=await adminRequest('ege_opportunities?'+params.toString())
       if(!rows?.length)return NextResponse.json({error:'No current market evidence found'},{status:404})
       return NextResponse.json(await analyseOpportunity(rows[0]))
+    }
+    if(body.action==='renew-supplier'){
+      if(body.paymentVerified!==true||typeof body.paymentReference!=='string'||!body.paymentReference.trim()||typeof body.supplierId!=='string')return NextResponse.json({error:'Verified R100 payment required'},{status:400})
+      const expires=await adminRequest('rpc/record_supplier_month',{method:'POST',body:JSON.stringify({p_supplier_id:body.supplierId,p_reference:body.paymentReference})});return NextResponse.json({ok:true,expires})
+    }
+    if(body.action==='enquiry-status'){
+      if(!/^[0-9a-f-]{36}$/i.test(String(body.id))||!['new','contacted','sourcing','quoted','closed'].includes(body.status))return NextResponse.json({error:'Invalid enquiry'},{status:400})
+      await adminRequest('procurement_enquiries?id=eq.'+encodeURIComponent(body.id),{method:'PATCH',body:JSON.stringify({status:body.status})});return NextResponse.json({ok:true})
+    }
+    if(body.action==='enquiry-candidate'){
+      if(typeof body.businessName!=='string'||!body.businessName.trim()||!['not_contacted','contacted','invited','registered','declined'].includes(body.recruitmentStatus))return NextResponse.json({error:'Invalid supplier candidate'},{status:400})
+      await insertAdminRecord('procurement_supplier_candidates',{enquiry_id:body.id,business_name:body.businessName,contact_details:body.contactDetails||null,quote_notes:body.quoteNotes||null,recruitment_status:body.recruitmentStatus});return NextResponse.json({ok:true})
     }
     if(body.action==='supplier-activation-settings'){
       if(!['founding_free','paid'].includes(body.mode)||!Number.isSafeInteger(body.feeCents)||body.feeCents<0||body.feeCents>2147483647||(body.mode==='paid'&&body.feeCents===0))return NextResponse.json({error:'Invalid activation fee'},{status:400})
