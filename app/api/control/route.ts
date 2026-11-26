@@ -179,7 +179,8 @@ export async function GET(request: Request) {
       adminRequest('products?select=id,name,description,category,image_url,retail_price_cents,supplier_cost_cents,stock_quantity,view_count,lifecycle_status,updated_at,supplier:suppliers(id,business_name,source_url,website_url)&order=updated_at.desc'),
       adminRequest('supplier_applications?select=*&order=created_at.desc&limit=200'),
     ])
-    return NextResponse.json({ marketSignals, supplierApplications, orders, products: products.filter((product: { category?: string }) => productCategories.includes(product.category || '')), metrics: { suppliers: suppliers.length, activePromotions: promotions.filter((promotion: Record<string, unknown>) => promotion.status === 'active').length, successfulPayments: payments.filter((payment: Record<string, unknown>) => payment.state === 'succeeded').length } })
+    const ceiApplications=await adminRequest('cei_applications?select=*&order=created_at.desc&limit=200'); const ceiContracts=await adminRequest('cei_contracts?select=*&order=starts_at.desc&limit=200');
+    return NextResponse.json({ ceiApplications,ceiContracts,marketSignals, supplierApplications, orders, products: products.filter((product: { category?: string }) => productCategories.includes(product.category || '')), metrics: { suppliers: suppliers.length, activePromotions: promotions.filter((promotion: Record<string, unknown>) => promotion.status === 'active').length, successfulPayments: payments.filter((payment: Record<string, unknown>) => payment.state === 'succeeded').length } })
   } catch { return NextResponse.json({ error: 'Control plane is not configured' }, { status: 503 }) }
 }
 
@@ -187,6 +188,18 @@ export async function POST(request: Request) {
   if (!hasControlApiAccess(request)) return NextResponse.json({ error: 'Unauthorised' }, { status: 401 })
   const body = await request.json().catch(() => ({}))
   try {
+    if(body.action==='cei-contract'){
+      const uuid=/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i
+      if(!uuid.test(String(body.applicationId))||body.paymentVerified!==true||!Number.isSafeInteger(body.amountCents)||body.amountCents<=0) return NextResponse.json({error:'Verified payment and valid application required'},{status:400})
+      for(const k of ['contractReference','paymentReference','province','municipality','startsAt','endsAt'])if(typeof body[k]!=='string'||!body[k].trim()||body[k].length>200)return NextResponse.json({error:'Complete contract details'},{status:400})
+      await insertAdminRecord('cei_contracts',{application_id:body.applicationId,contract_reference:body.contractReference,payment_reference:body.paymentReference,amount_cents:body.amountCents,payment_verified_at:new Date().toISOString(),province:body.province,municipality:body.municipality,starts_at:body.startsAt,ends_at:body.endsAt})
+      return NextResponse.json({ok:true})
+    }
+    if(body.action==='cei-revoke'){
+      if(!/^[0-9a-f-]{36}$/i.test(String(body.contractId)))return NextResponse.json({error:'Invalid contract'},{status:400})
+      await adminRequest('cei_contracts?id=eq.'+encodeURIComponent(body.contractId),{method:'PATCH',body:JSON.stringify({revoked_at:new Date().toISOString()})})
+      return NextResponse.json({ok:true})
+    }
     if(body.action==='analyse-ege'){
       const fields=['province','municipality','category','kind','requested_item','unit','frequency','currency']
       const params=new URLSearchParams({select:'*',limit:'1'})
