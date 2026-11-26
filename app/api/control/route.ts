@@ -185,6 +185,13 @@ export async function POST(request: Request) {
   if (!hasControlApiAccess(request)) return NextResponse.json({ error: 'Unauthorised' }, { status: 401 })
   const body = await request.json().catch(() => ({}))
   try {
+    if(body.action==='activate-supplier'){
+      const id=String(body.applicationId||''), owner=String(body.ownerId||'')
+      const uuid=/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i
+      if(!uuid.test(id)||!uuid.test(owner)) return NextResponse.json({error:'Valid application and account IDs required'},{status:400})
+      const supplierId=await adminRequest('rpc/activate_supplier_application',{method:'POST',body:JSON.stringify({p_application_id:id,p_owner_id:owner})})
+      return NextResponse.json({ok:true,supplierId})
+    }
     if (body.action === 'review-supplier-application') {
       const id=String(body.applicationId||'')
       const decision=String(body.decision||'')
