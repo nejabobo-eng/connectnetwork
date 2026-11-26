@@ -169,7 +169,7 @@ async function permanentlyDeleteProduct(productId: string) {
 export async function GET(request: Request) {
   if (!hasControlApiAccess(request)) return NextResponse.json({ error: 'Unauthorised' }, { status: 401 })
   try {
-    const marketSignals = await adminRequest('geographical_demand_matching?select=*&order=verified_intentions.desc,request_count.desc&limit=200')
+    const marketSignals = await adminRequest('ege_opportunities?select=*&order=verified_intentions.desc,request_count.desc&limit=200')
     const [suppliers, promotions, payments, orders, products, supplierApplications] = await Promise.all([
       adminRequest('suppliers?select=id'),
       adminRequest('promotions?select=id,status'),
