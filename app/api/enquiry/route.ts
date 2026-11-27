@@ -26,17 +26,17 @@ export async function POST(request: Request) {
       try { return NextResponse.json({ discovery: await discoverDemand(body.kind, body.item) }) } catch { return NextResponse.json({ discovery: null }) }
     }
 
-    const fields: Record<string, number> = { customer_name: 150, phone: 30, email: 254, province: 100, municipality: 150, requested_item: 1000, quantity_details: 300, required_by: 10 }
+    const fields: Record<string, number> = { customer_name: 150, phone: 30, email: 254, province: 100, municipality: 150, requested_item: 1000, quantity_details: 300, required_by: 10, locality: 150, enquiry_kind: 20 }
     if (typeof body.required_by !== 'string' || !/^\\d{4}-\\d{2}-\\d{2}$/.test(body.required_by) || body.required_by < new Date().toISOString().slice(0, 10)) return NextResponse.json({ error: 'Enter a future required-by date.' }, { status: 400 })
-    const row: Record<string, unknown> = { consent: true }
+    const row: Record<string, unknown> = { consent: true, share_phone_with_matched_suppliers: body.share_phone_with_matched_suppliers === true }
     if (body.consent !== true) return NextResponse.json({ error: 'Contact consent required' }, { status: 400 })
     for (const [field, max] of Object.entries(fields)) {
       const value = body[field]
-      if (field === 'email' && !value) { row[field] = null; continue }
+      if (field === 'locality' && !value) { row[field] = null; continue }\n      if (field === 'email' && !value) { row[field] = null; continue }
       if (typeof value !== 'string' || !value.trim() || value.length > max) return NextResponse.json({ error: 'Complete all required fields' }, { status: 400 })
       row[field] = value.trim()
     }
-    await insertAdminRecord('procurement_enquiries', row)
+    if (!['goods', 'services', 'not_sure'].includes(String(body.enquiry_kind))) return NextResponse.json({ error: 'Choose goods or services.' }, { status: 400 })\n    await insertAdminRecord('procurement_enquiries', row)
     return NextResponse.json({ ok: true })
   } catch {
     return NextResponse.json({ error: 'Could not submit enquiry' }, { status: 400 })
