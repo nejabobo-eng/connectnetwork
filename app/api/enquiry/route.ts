@@ -26,7 +26,8 @@ export async function POST(request: Request) {
       try { return NextResponse.json({ discovery: await discoverDemand(body.kind, body.item) }) } catch { return NextResponse.json({ discovery: null }) }
     }
 
-    const fields: Record<string, number> = { customer_name: 150, phone: 30, email: 254, province: 100, municipality: 150, requested_item: 1000, quantity_details: 300 }
+    const fields: Record<string, number> = { customer_name: 150, phone: 30, email: 254, province: 100, municipality: 150, requested_item: 1000, quantity_details: 300, required_by: 10 }
+    if (typeof body.required_by !== 'string' || !/^\\d{4}-\\d{2}-\\d{2}$/.test(body.required_by) || body.required_by < new Date().toISOString().slice(0, 10)) return NextResponse.json({ error: 'Enter a future required-by date.' }, { status: 400 })
     const row: Record<string, unknown> = { consent: true }
     if (body.consent !== true) return NextResponse.json({ error: 'Contact consent required' }, { status: 400 })
     for (const [field, max] of Object.entries(fields)) {
