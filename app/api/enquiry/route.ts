@@ -8,14 +8,14 @@ export async function POST(request: Request) {
     const body = await request.json()
 
     if (body.action === 'supplier-registration') {
-      const fields: Record<string, number> = { business_name: 150, business_type: 50, contact_name: 150, email: 254, phone: 30, province: 100, municipality: 150, locality: 150, service_areas: 1000, offering: 1000, product_categories: 500, capacity_notes: 1000, delivery_capable: 30, typical_lead_time: 150, vat_status: 30, rfq_email: 254 }
+      const fields: Record<string, number> = { business_name: 150, business_type: 50, contact_name: 150, email: 254, phone: 30, province: 100, municipality: 150, locality: 150, service_areas: 1000, offering: 1000, product_categories: 500, capacity_notes: 1000, delivery_capable: 30, typical_lead_time: 150, vat_status: 30, rfq_email: 254, supply_type: 20 }
       const row: Record<string, string> = {}
       for (const [field, max] of Object.entries(fields)) {
         const value = body[field]
         if (typeof value !== 'string' || !value.trim() || value.trim().length > max) return NextResponse.json({ error: 'Please complete all supplier registration fields.' }, { status: 400 })
         row[field] = value.trim()
       }
-      if (!['individual', 'registered_business'].includes(row.business_type) || !['yes', 'collection_only', 'case_by_case'].includes(row.delivery_capable) || !['registered', 'not_registered'].includes(row.vat_status)) return NextResponse.json({ error: 'Invalid supplier profile selection.' }, { status: 400 })
+      if (!['individual', 'registered_business'].includes(row.business_type) || !['yes', 'collection_only', 'case_by_case'].includes(row.delivery_capable) || !['registered', 'not_registered'].includes(row.vat_status) || !['goods', 'services', 'both'].includes(row.supply_type)) return NextResponse.json({ error: 'Invalid supplier profile selection.' }, { status: 400 })
       await insertAdminRecord('supplier_applications', row)
       return NextResponse.json({ ok: true })
     }
