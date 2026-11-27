@@ -23,7 +23,8 @@ export async function POST(request: Request) {
     }
     await insertAdminRecord('supplier_applications', row)
     return NextResponse.json({ ok: true })
-  } catch {
+  } catch (error) {
+    console.error('Supplier registration failed', error)
     return NextResponse.json({ error: 'Unable to submit application. Please try again.' }, { status: 400 })
   }
 }
