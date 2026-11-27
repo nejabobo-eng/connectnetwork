@@ -36,7 +36,8 @@ export async function POST(request: Request) {
       if (typeof value !== 'string' || !value.trim() || value.length > max) return NextResponse.json({ error: 'Complete all required fields' }, { status: 400 })
       row[field] = value.trim()
     }
-    if (!['goods', 'services', 'not_sure'].includes(String(body.enquiry_kind))) return NextResponse.json({ error: 'Choose goods or services.' }, { status: 400 })\n    await insertAdminRecord('procurement_enquiries', row)
+    if (!['goods', 'services', 'not_sure'].includes(String(body.enquiry_kind))) return NextResponse.json({ error: 'Choose goods or services.' }, { status: 400 })\n    if (!['goods', 'services', 'not_sure'].includes(String(body.enquiry_kind))) return NextResponse.json({ error: 'Choose goods or services.' }, { status: 400 })
+    await insertAdminRecord('procurement_enquiries', row)
     return NextResponse.json({ ok: true })
   } catch {
     return NextResponse.json({ error: 'Could not submit enquiry' }, { status: 400 })
