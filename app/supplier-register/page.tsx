@@ -14,7 +14,7 @@ export default function SupplierRegistration() {
     try {
       const fields = ['business_name', 'business_type', 'contact_name', 'email', 'phone', 'province', 'municipality', 'locality', 'service_areas', 'offering']
       const payload = Object.fromEntries(fields.map(field => [field, String(data.get(field) || '').trim()]))
-      const response = await fetch('/api/supplier-register', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) })
+      const response = await fetch('/api/enquiry', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ action: 'supplier-registration', ...payload }) })
       const result = await response.json().catch(() => ({}))
       if (!response.ok) throw new Error(result.error || 'Unable to submit application. Please try again.')
       form.reset()
