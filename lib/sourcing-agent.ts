@@ -93,7 +93,7 @@ export async function createSourcingPlan(enquiryId: string, external: ExternalCa
   const request = enquiry as Enquiry
   const [registeredApplications, existing] = await Promise.all([
     adminRequest('supplier_applications?status=eq.approved&select=id,business_name,email,rfq_email,offering,product_categories,capacity_notes,province,municipality,locality,delivery_capable,supply_type'),
-    adminRequest(`procurement_supplier_candidates?enquiry_id=eq.${encodeURIComponent(enquiryId)}&select=*),
+    adminRequest(`procurement_supplier_candidates?enquiry_id=eq.${encodeURIComponent(enquiryId)}&select=*`),
   ]) as [SupplierApplication[], Candidate[]]
 
   const registered = registeredApplications
@@ -198,7 +198,7 @@ export async function createSourcingPlan(enquiryId: string, external: ExternalCa
 
 export async function sendQueuedRfq(queueId: string) {
   const [rfq] = await adminRequest(
-    `procurement_rfq_queue?id=eq.${encodeURIComponent(queueId)}&status=eq.queued&select=*),
+    `procurement_rfq_queue?id=eq.${encodeURIComponent(queueId)}&status=eq.queued&select=*`),
   )
   if (!rfq) throw new Error('Queued RFQ was not found or has already been processed.')
   const key = process.env.RESEND_API_KEY
