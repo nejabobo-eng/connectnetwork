@@ -197,9 +197,8 @@ export async function createSourcingPlan(enquiryId: string, external: ExternalCa
 }
 
 export async function sendQueuedRfq(queueId: string) {
-  const [rfq] = await adminRequest(
-    `procurement_rfq_queue?id=eq.${encodeURIComponent(queueId)}&status=eq.queued&select=*`),
-  )
+  const queuedRows = await adminRequest(`procurement_rfq_queue?id=eq.${encodeURIComponent(queueId)}&status=eq.queued&select=*`) as Array<Record<string, unknown>>
+  const rfq = queuedRows[0]
   if (!rfq) throw new Error('Queued RFQ was not found or has already been processed.')
   const key = process.env.RESEND_API_KEY
   const from = process.env.RFQ_FROM_EMAIL || 'Connect Network <info@connectnetwork.co.za>'
