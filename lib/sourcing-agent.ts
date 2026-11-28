@@ -15,6 +15,7 @@ type Enquiry = {
 }
 type SupplierApplication = {
   id: string
+  activated_supplier_id?: string | null
   business_name: string
   email?: string | null
   rfq_email?: string | null
@@ -93,7 +94,7 @@ export async function createSourcingPlan(enquiryId: string, external: ExternalCa
   if (!enquiry) throw new Error('Enquiry was not found.')
   const request = enquiry as Enquiry
   const [registeredApplications, existing] = await Promise.all([
-    adminRequest('supplier_applications?status=eq.approved&select=id,business_name,email,rfq_email,offering,product_categories,capacity_notes,province,municipality,locality,delivery_capable,supply_type'),
+    adminRequest('supplier_applications?status=eq.approved&select=id,activated_supplier_id,business_name,email,rfq_email,offering,product_categories,capacity_notes,province,municipality,locality,delivery_capable,supply_type'),
     adminRequest(`procurement_supplier_candidates?enquiry_id=eq.${encodeURIComponent(enquiryId)}&select=*`),
   ]) as [SupplierApplication[], Candidate[]]
 
@@ -108,7 +109,7 @@ export async function createSourcingPlan(enquiryId: string, external: ExternalCa
     )
 
   const proposed: Candidate[] = registered.map(({ supplier, matchScore }) => ({
-    supplier_id: supplier.id,
+    supplier_id: supplier.activated_supplier_id || null,
     business_name: supplier.business_name,
     contact_details: supplier.rfq_email || supplier.email || null,
     category: supplier.product_categories || null,
