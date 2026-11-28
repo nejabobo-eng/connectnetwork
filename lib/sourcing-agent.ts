@@ -1,3 +1,4 @@
+import nodemailer from 'nodemailer'
 import { adminRequest, insertAdminRecord } from '@/lib/supabase-admin'
 
 const MAX_SUPPLIERS = 5
@@ -200,9 +201,9 @@ export async function sendQueuedRfq(queueId: string) {
   const queuedRows = await adminRequest(`procurement_rfq_queue?id=eq.${encodeURIComponent(queueId)}&status=eq.queued&select=*`) as Array<Record<string, unknown>>
   const rfq = queuedRows[0] as { procurement_reference: string; recipient_email: string; requirements_snapshot: unknown } | undefined
   if (!rfq) throw new Error('Queued RFQ was not found or has already been processed.')
-  const key = process.env.RESEND_API_KEY
+  const smtpPassword = process.env.TITAN_SMTP_PASSWORD
   const from = process.env.RFQ_FROM_EMAIL || 'Connect Network <info@connectnetwork.co.za>'
-  if (!key) throw new Error('RFQ email is not configured. Add RESEND_API_KEY before dispatching.')
+  if (!smtpPassword) throw new Error('RFQ email is not configured. Add TITAN_SMTP_PASSWORD before dispatching.')
 
   const requirement = rfq.requirements_snapshot as {
     item: string
@@ -213,28 +214,31 @@ export async function sendQueuedRfq(queueId: string) {
   }
   const locality = requirement.delivery_area.locality ? `, ${requirement.delivery_area.locality}` : ''
   const requiredBy = requirement.required_by ? `<p><strong>Required by:</strong> ${escapeHtml(requirement.required_by)}</p>` : ''
-  const result = await fetch('https://api.resend.com/emails', {
-    method: 'POST',
-    headers: { Authorization: `Bearer ${key}`, 'Content-Type': 'application/json' },
-    body: JSON.stringify({
-      from, to: [rfq.recipient_email],
-      subject: `Request for quotation: ${rfq.procurement_reference}`,
-      html: `<h1>Request for quotation</h1><p>Reference: <strong>${escapeHtml(rfq.procurement_reference)}</strong></p><p>Connect Network requests your pricing for the following requirement.</p><p><strong>Item/service:</strong> ${escapeHtml(requirement.item)}</p><p><strong>Specifications and quantity:</strong> ${escapeHtml(requirement.specifications_and_quantity)}</p><p><strong>Delivery area:</strong> ${escapeHtml(requirement.delivery_area.municipality)}${escapeHtml(locality)}, ${escapeHtml(requirement.delivery_area.province)}</p>${requiredBy}<p><strong>Customer email for quotations:</strong> <a href="mailto:${escapeHtml(requirement.customer_email)}">${escapeHtml(requirement.customer_email)}</a></p><p>Please reply directly to the customer with your price, availability, delivery terms, VAT treatment and quotation validity.</p><p>Regards,<br/>Connect Network Procurement<br/>info@connectnetwork.co.za</p>`,
-    }),
+  const transporter = nodemailer.createTransport({
+    host: process.env.TITAN_SMTP_HOST || 'smtp.titan.email',
+    port: Number(process.env.TITAN_SMTP_PORT || 465),
+    secure: true,
+    auth: { user: process.env.TITAN_SMTP_USER || 'info@connectnetwork.co.za', pass: smtpPassword },
   })
-  if (!result.ok) {
-    const failure = `Email provider returned ${result.status}`
+  let provider: { messageId?: string }
+  try {
+    provider = await transporter.sendMail({
+      from, to: rfq.recipient_email,
+      subject: `Request for quotation: ${rfq.procurement_reference}`,
+`<h1>Request for quotation</h1><p>Reference: <strong>${escapeHtml(rfq.procurement_reference)}</strong></p><p>Connect Network requests your pricing for the following requirement.</p><p><strong>Item/service:</strong> ${escapeHtml(requirement.item)}</p><p><strong>Specifications and quantity:</strong> ${escapeHtml(requirement.specifications_and_quantity)}</p><p><strong>Delivery area:</strong> ${escapeHtml(requirement.delivery_area.municipality)}${escapeHtml(locality)}, ${escapeHtml(requirement.delivery_area.province)}</p>${requiredBy}<p><strong>Customer email for quotations:</strong> <a href="mailto:${escapeHtml(requirement.customer_email)}">${escapeHtml(requirement.customer_email)}</a></p><p>Please reply directly to the customer with your price, availability, delivery terms, VAT treatment and quotation validity.</p><p>Regards,<br/>Connect Network Procurement<br/>info@connectnetwork.co.za</p>`
+    })
+  } catch (error) {
+    const failure = error instanceof Error ? error.message.slice(0, 500) : 'Titan SMTP delivery failed'
     await adminRequest(`procurement_rfq_queue?id=eq.${encodeURIComponent(queueId)}`, {
       method: 'PATCH', body: JSON.stringify({ status: 'failed', failure_reason: failure }),
     })
-    throw new Error(failure)
+    throw new Error(`Titan SMTP delivery failed: ${failure}`)
   }
-  const provider = await result.json() as { id?: string }
   await adminRequest(`procurement_rfq_queue?id=eq.${encodeURIComponent(queueId)}`, {
     method: 'PATCH',
     body: JSON.stringify({
       status: 'sent', sent_at: new Date().toISOString(),
-      provider_message_id: provider.id || null,
+      provider_message_id: provider.messageId || null,
     }),
   })
   return { sent: true, reference: rfq.procurement_reference }
