@@ -77,8 +77,7 @@ function emailFrom(candidate: Candidate) {
 function supplierSafeText(value: string, customerName = '') {
   let safe = value
   if (customerName.trim().length >= 2) {
-    const escaped = customerName.trim().replace(/[.*+?^${}()|[\]\\]/g, '\\function supplierSafeText(value: string) {
-  return value')
+    const escaped = customerName.trim().split('').map(ch => /[a-z0-9 ]/i.test(ch) ? ch : '\\u' + ch.charCodeAt(0).toString(16).padStart(4, '0')).join('')
     safe = safe.replace(new RegExp(escaped, 'gi'), '[redacted]')
   }
   return safe
