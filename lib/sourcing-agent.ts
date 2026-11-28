@@ -5,6 +5,7 @@ const MAX_SUPPLIERS = 5
 
 type Enquiry = {
   id: string
+  customer_name: string
   requested_item: string
   quantity_details: string
   province: string
@@ -73,8 +74,16 @@ function emailFrom(candidate: Candidate) {
   const match = contact.match(/[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}/i)
   return match?.[0]?.toLowerCase() || ''
 }
-function supplierSafeText(value: string) {
-  return value
+function supplierSafeText(value: string, customerName = '') {
+  let safe = value
+  if (customerName.trim().length >= 2) {
+    const escaped = customerName.trim().replace(/[.*+?^${}()|[\]\\]/g, '\\function supplierSafeText(value: string) {
+  return value')
+    safe = safe.replace(new RegExp(escaped, 'gi'), '[redacted]')
+  }
+  return safe
+    .replace(/\b(?:https?:\/\/|www\.)[^\s]+/gi, '[redacted]')
+    .replace(/\b\d{1,6}\s+[\p{L}\s.'-]{2,60}\s(?:street|road|avenue|lane|drive|close|crescent|way|rd|st)\b/giu, '[redacted]')
     .replace(/[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}/ig, '[redacted]')
     .replace(/(?:\+?\d[\d\s()\-]{6,}\d)/g, '[redacted]')
 }
@@ -89,7 +98,7 @@ function escapeHtml(value: string) {
 
 export async function createSourcingPlan(enquiryId: string, external: ExternalCandidateInput[] = []) {
   const [enquiry] = await adminRequest(
-    `procurement_enquiries?id=eq.${encodeURIComponent(enquiryId)}&select=id,requested_item,quantity_details,province,municipality,locality,required_by,email`,
+    `procurement_enquiries?id=eq.${encodeURIComponent(enquiryId)}&select=id,customer_name,requested_item,quantity_details,province,municipality,locality,required_by,email`,
   )
   if (!enquiry) throw new Error('Enquiry was not found.')
   const request = enquiry as Enquiry
@@ -152,12 +161,12 @@ export async function createSourcingPlan(enquiryId: string, external: ExternalCa
   }
 
   const supplierSafeSnapshot = {
-    item: supplierSafeText(request.requested_item),
-    specifications_and_quantity: supplierSafeText(request.quantity_details),
+    item: supplierSafeText(request.requested_item, request.customer_name),
+    specifications_and_quantity: supplierSafeText(request.quantity_details, request.customer_name),
     delivery_area: {
-      province: request.province,
-      municipality: request.municipality,
-      locality: request.locality || null,
+      province: supplierSafeText(request.province, request.customer_name),
+      municipality: supplierSafeText(request.municipality, request.customer_name),
+      locality: null,
     },
     required_by: request.required_by || null,
     customer_email: request.email,
@@ -213,7 +222,7 @@ export async function sendQueuedRfq(queueId: string) {
     required_by?: string | null
     customer_email: string
   }
-  const locality = requirement.delivery_area.locality ? `, ${requirement.delivery_area.locality}` : ''
+  const locality = ''
   const requiredBy = requirement.required_by ? `<p><strong>Required by:</strong> ${escapeHtml(requirement.required_by)}</p>` : ''
   let provider: { messageId?: string }
   try {
@@ -224,7 +233,7 @@ export async function sendQueuedRfq(queueId: string) {
       body: JSON.stringify({
       from, to: [rfq.recipient_email],
       subject: `Request for quotation: ${rfq.procurement_reference}`,
-      html: `<h1>Request for quotation</h1><p>Reference: <strong>${escapeHtml(rfq.procurement_reference)}</strong></p><p>Connect Network requests your pricing for the following requirement.</p><p><strong>Item/service:</strong> ${escapeHtml(requirement.item)}</p><p><strong>Specifications and quantity:</strong> ${escapeHtml(requirement.specifications_and_quantity)}</p><p><strong>Delivery area:</strong> ${escapeHtml(requirement.delivery_area.municipality)}${escapeHtml(locality)}, ${escapeHtml(requirement.delivery_area.province)}</p>${requiredBy}<p><strong>Customer email for quotations:</strong> <a href="mailto:${escapeHtml(requirement.customer_email)}">${escapeHtml(requirement.customer_email)}</a></p><p>Please reply directly to the customer with your price, availability, delivery terms, VAT treatment and quotation validity.</p><p>Regards,<br/>Connect Network Procurement<br/>info@connectnetwork.co.za</p>`,
+      html: `<h1>Request for quotation</h1><p>Reference: <strong>${escapeHtml(rfq.procurement_reference)}</strong></p><p>Connect Network requests your pricing for the following requirement.</p><p><strong>Item/service:</strong> ${escapeHtml(supplierSafeText(requirement.item))}</p><p><strong>Specifications and quantity:</strong> ${escapeHtml(supplierSafeText(requirement.specifications_and_quantity))}</p><p><strong>Delivery area:</strong> ${escapeHtml(supplierSafeText(requirement.delivery_area.municipality))}${escapeHtml(locality)}, ${escapeHtml(supplierSafeText(requirement.delivery_area.province))}</p>${requiredBy}<p><strong>Customer email for quotations:</strong> <a href="mailto:${escapeHtml(requirement.customer_email)}">${escapeHtml(requirement.customer_email)}</a></p><p>Please reply directly to the customer with your price, availability, delivery terms, VAT treatment and quotation validity.</p><p>Regards,<br/>Connect Network Procurement<br/>info@connectnetwork.co.za</p>`,
       }),
     })
     const result = await response.json() as { id?: string }
