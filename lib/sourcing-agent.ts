@@ -243,3 +243,5 @@ export async function sendQueuedRfq(queueId: string) {
   })
   return { sent: true, reference: rfq.procurement_reference }
 }
+
+// Titan SMTP deployment refresh.
