@@ -67,7 +67,7 @@ export async function POST(request: Request) {
 
     const row: Record<string, unknown> = {
       consent: true,
-      share_phone_with_matched_suppliers: body.share_phone_with_matched_suppliers === true,
+      share_phone_with_matched_suppliers: false,
     }
     for (const [field, max] of Object.entries(fields)) {
       const value = body[field]
@@ -83,6 +83,7 @@ export async function POST(request: Request) {
     if (!['goods', 'services', 'not_sure'].includes(String(body.enquiry_kind))) {
       return NextResponse.json({ error: 'Choose goods, services, or not sure.' }, { status: 400 })
     }
+    if (!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(String(row.email))) return NextResponse.json({error:'Enter a valid quotation email address.'},{status:400})
     await insertAdminRecord('procurement_enquiries', row)
     return NextResponse.json({ ok: true })
   } catch {
